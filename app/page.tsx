@@ -285,7 +285,7 @@ export default function HomePage() {
               variant="outline"
               className="border-2 border-white text-white hover:bg-white hover:text-[#A63D00] bg-transparent px-8 py-4 text-lg font-bold transition-all duration-200 transform hover:scale-105 hover:shadow-[0_6px_0_0_#000]"
             >
-              <Link href="/mentors">Become a Mentor</Link>
+              <Link href="/become-mentor">Become a Mentor</Link>
             </Button>
           </div>
         </div>
