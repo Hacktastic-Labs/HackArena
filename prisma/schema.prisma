@@ -20,6 +20,13 @@ enum Role {
   MENTOR
 }
 
+enum ProblemStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
 model User {
   id              String   @id @default(cuid())
   email           String   @unique
@@ -39,6 +46,10 @@ model User {
   // Event System relationships
   organizedEvents Event[]        @relation("OrganizedEvents")
   registrations   Registration[]
+  
+  // Problem System relationships
+  problems        Problem[]      @relation("StudentProblems")  // Problems posted by this user
+  mentoredProblems Problem[]     @relation("MentorProblems")   // Problems this user is mentoring
   
   @@map("users")
 }
@@ -121,4 +132,26 @@ model Registration {
   @@unique([userId, eventId])
   @@index([eventId])
   @@index([userId])
+}
+
+model Problem {
+  id          String        @id @default(cuid())
+  title       String
+  description String
+  status      ProblemStatus @default(OPEN)
+  tags        String[]      // Array of tags for the problem
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @updatedAt @map("updated_at")
+  
+  // Relationships
+  userId      String        @map("user_id")
+  user        User          @relation("StudentProblems", fields: [userId], references: [id], onDelete: Cascade)
+  
+  mentorId    String?       @map("mentor_id") // Optional mentor assigned to help
+  mentor      User?         @relation("MentorProblems", fields: [mentorId], references: [id], onDelete: SetNull)
+  
+  @@index([userId])
+  @@index([mentorId])
+  @@index([status])
+  @@map("problems")
 }
