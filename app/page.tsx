@@ -185,7 +185,7 @@ export default function HomePage() {
             </div>
 
             {/* Bottom right - Success Rate */}
-            <div className="bg-gradient-to-br from-[#4ECDC4] to-[#44B3AC] rounded-2xl p-6 text-white relative overflow-hidden">
+            <div className="bg-gradient-to-br from-[#FFB74D] to-[#FF9800] rounded-2xl p-6 text-white relative overflow-hidden">
               <div className="absolute bottom-0 left-0 w-16 h-16 bg-white/20 rounded-full translate-y-8 -translate-x-8"></div>
               <div className="relative z-10">
                 <div className="text-3xl font-black mb-2">98%</div>
