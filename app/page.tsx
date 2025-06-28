@@ -15,7 +15,7 @@ export default function HomePage() {
               </div>
               <div>
                 <span className="text-2xl font-bold text-gray-900">Synora</span>
-                <span className="text-sm text-gray-500 ml-2">by StudentMentor</span>
+                <span className="text-sm text-gray-500 ml-2">by Hacktastic</span>
               </div>
             </div>
             <div className="flex items-center space-x-4">
@@ -67,12 +67,7 @@ export default function HomePage() {
                   </Link>
                 </Button>
 
-                <div className="flex items-center space-x-3 p-4 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50">
-                  <code className="text-gray-800 font-mono">synora connect-mentor</code>
-                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                    <Copy className="h-4 w-4" />
-                  </Button>
-                </div>
+               
               </div>
             </div>
 
