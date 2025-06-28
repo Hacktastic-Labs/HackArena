@@ -23,6 +23,8 @@ export default function RegisterPage() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const router = useRouter();
+  const [fade, setFade] = useState(true);
+  const [swipeDir, setSwipeDir] = useState<'left' | 'right' | null>(null);
 
   // Form state
   const [formData, setFormData] = useState({
@@ -138,6 +140,18 @@ export default function RegisterPage() {
     setIsLoading(false);
   };
 
+  const handleSwitch = (login: boolean) => {
+    setSwipeDir(login ? 'left' : 'right');
+    setFade(false);
+    setTimeout(() => {
+      setIsLogin(login);
+      setFade(true);
+      setSwipeDir(null);
+      setError("");
+      setSuccess("");
+    }, 400);
+  };
+
   return (
     <div className="min-h-screen bg-white">
       {/* Navigation */}
@@ -146,14 +160,18 @@ export default function RegisterPage() {
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-3">
               <Link href="/" className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-[#A63D00] rounded-xl flex items-center justify-center">
-                  <span className="text-white font-bold text-xl">H</span>
-                </div>
-                <div>
-                  <span className="text-2xl font-bold text-gray-900">
-                    HackArena
+                <img
+                  src="/sfinal.png"
+                  alt="Synora Logo"
+                  className="w-12 h-12 rounded-md shadow object-contain p-0"
+                />
+                <div className="flex flex-col justify-center">
+                  <span className="text-2xl font-bold text-gray-900 font-inter leading-tight">
+                    Synora
                   </span>
-                  <span className="text-sm text-gray-500 ml-2">IIIT Delhi</span>
+                  <span className="text-base text-gray-400 leading-tight">
+                    by Hacktastic
+                  </span>
                 </div>
               </Link>
             </div>
@@ -201,137 +219,99 @@ export default function RegisterPage() {
             )}
 
             {/* Toggle Buttons */}
-            <div className="flex bg-gray-100 rounded-lg p-1">
+            <div className="flex gap-4">
               <button
                 type="button"
-                onClick={() => {
-                  setIsLogin(false);
-                  setError("");
-                  setSuccess("");
-                }}
-                className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all ${
-                  !isLogin
-                    ? "bg-[#A63D00] text-white shadow-sm"
-                    : "text-gray-600 hover:text-gray-900"
-                }`}
+                onClick={() => handleSwitch(false)}
+                className={`flex-1 py-2 px-4 rounded-md text-base font-bold border-2 border-[#A63D00] shadow-[6px_6px_0px_0px_#000000] transition-all duration-150
+                  ${!isLogin
+                    ? 'bg-[#A63D00] text-white hover:bg-[#A63D00]/90'
+                    : 'bg-[#FFF8E1] text-[#A63D00] hover:bg-white hover:shadow-[3px_3px_0px_0px_#000000] hover:translate-x-1 hover:translate-y-1'}
+                `}
               >
                 Register
               </button>
               <button
                 type="button"
-                onClick={() => {
-                  setIsLogin(true);
-                  setError("");
-                  setSuccess("");
-                }}
-                className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all ${
-                  isLogin
-                    ? "bg-[#A63D00] text-white shadow-sm"
-                    : "text-gray-600 hover:text-gray-900"
-                }`}
+                onClick={() => handleSwitch(true)}
+                className={`flex-1 py-2 px-4 rounded-md text-base font-bold border-2 border-[#A63D00] shadow-[6px_6px_0px_0px_#000000] transition-all duration-150
+                  ${isLogin
+                    ? 'bg-[#A63D00] text-white hover:bg-[#A63D00]/90'
+                    : 'bg-[#FFF8E1] text-[#A63D00] hover:bg-white hover:shadow-[3px_3px_0px_0px_#000000] hover:translate-x-1 hover:translate-y-1'}
+                `}
               >
                 Login
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
-              {!isLogin && (
-                <>
-                  {/* Username */}
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-700">
-                      Username *
-                    </label>
-                    <div className="relative">
-                      <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                      <Input
-                        type="text"
-                        name="username"
-                        value={formData.username}
-                        onChange={handleInputChange}
-                        placeholder="Choose a unique username"
-                        className="pl-10 border-2 border-gray-200 focus:border-[#A63D00] focus:ring-[#A63D00]/20"
-                        required
-                      />
+            <div className={`transition-all duration-500
+              ${fade ? 'opacity-100 translate-x-0' : swipeDir === 'left' ? 'opacity-0 -translate-x-16' : swipeDir === 'right' ? 'opacity-0 translate-x-16' : ''}
+            `}>
+              <form onSubmit={handleSubmit} className="space-y-6">
+                {!isLogin && (
+                  <>
+                    {/* Username */}
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-gray-700">
+                        Username *
+                      </label>
+                      <div className="relative">
+                        <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                        <Input
+                          type="text"
+                          name="username"
+                          value={formData.username}
+                          onChange={handleInputChange}
+                          placeholder="Choose a unique username"
+                          className="pl-10 border-2 border-gray-200 focus:border-[#A63D00] focus:ring-[#A63D00]/20"
+                          required
+                        />
+                      </div>
                     </div>
-                  </div>
-                </>
-              )}
+                  </>
+                )}
 
-              {/* Email */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">
-                  Email Address *
-                </label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                  <Input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    placeholder="Enter your email"
-                    className="pl-10 border-2 border-gray-200 focus:border-[#A63D00] focus:ring-[#A63D00]/20"
-                    required
-                  />
-                </div>
-              </div>
-
-              {/* Password */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">
-                  Password *
-                </label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                  <Input
-                    type={showPassword ? "text" : "password"}
-                    name="password"
-                    value={formData.password}
-                    onChange={handleInputChange}
-                    placeholder="Enter your password"
-                    className="pl-10 pr-10 border-2 border-gray-200 focus:border-[#A63D00] focus:ring-[#A63D00]/20"
-                    required
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                  >
-                    {showPassword ? (
-                      <EyeOff className="h-4 w-4" />
-                    ) : (
-                      <Eye className="h-4 w-4" />
-                    )}
-                  </button>
-                </div>
-              </div>
-
-              {/* Confirm Password (Register only) */}
-              {!isLogin && (
+                {/* Email */}
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-gray-700">
-                    Confirm Password *
+                    Email Address *
+                  </label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    <Input
+                      type="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleInputChange}
+                      placeholder="Enter your email"
+                      className="pl-10 border-2 border-gray-200 focus:border-[#A63D00] focus:ring-[#A63D00]/20"
+                      required
+                    />
+                  </div>
+                </div>
+
+                {/* Password */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700">
+                    Password *
                   </label>
                   <div className="relative">
                     <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                     <Input
-                      type={showConfirmPassword ? "text" : "password"}
-                      name="confirmPassword"
-                      value={formData.confirmPassword}
+                      type={showPassword ? "text" : "password"}
+                      name="password"
+                      value={formData.password}
                       onChange={handleInputChange}
-                      placeholder="Confirm your password"
+                      placeholder="Enter your password"
                       className="pl-10 pr-10 border-2 border-gray-200 focus:border-[#A63D00] focus:ring-[#A63D00]/20"
                       required
                     />
                     <button
                       type="button"
-                      onClick={() =>
-                        setShowConfirmPassword(!showConfirmPassword)
-                      }
+                      onClick={() => setShowPassword(!showPassword)}
                       className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
                     >
-                      {showConfirmPassword ? (
+                      {showPassword ? (
                         <EyeOff className="h-4 w-4" />
                       ) : (
                         <Eye className="h-4 w-4" />
@@ -339,52 +319,83 @@ export default function RegisterPage() {
                     </button>
                   </div>
                 </div>
-              )}
 
-              {/* Role Selection */}
-              {!isLogin && (
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-700">
-                    Select Role *
-                  </label>
-                  <div className="flex space-x-4">
-                    <Button
-                      type="button"
-                      variant={role === "STUDENT" ? "default" : "outline"}
-                      className="flex-1"
-                      onClick={() => setRole("STUDENT")}
-                    >
-                      Student
-                    </Button>
-                    <Button
-                      type="button"
-                      variant={role === "MENTOR" ? "default" : "outline"}
-                      className="flex-1"
-                      onClick={() => setRole("MENTOR")}
-                    >
-                      Mentor
-                    </Button>
+                {/* Confirm Password (Register only) */}
+                {!isLogin && (
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-700">
+                      Confirm Password *
+                    </label>
+                    <div className="relative">
+                      <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                      <Input
+                        type={showConfirmPassword ? "text" : "password"}
+                        name="confirmPassword"
+                        value={formData.confirmPassword}
+                        onChange={handleInputChange}
+                        placeholder="Confirm your password"
+                        className="pl-10 pr-10 border-2 border-gray-200 focus:border-[#A63D00] focus:ring-[#A63D00]/20"
+                        required
+                      />
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setShowConfirmPassword(!showConfirmPassword)
+                        }
+                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      >
+                        {showConfirmPassword ? (
+                          <EyeOff className="h-4 w-4" />
+                        ) : (
+                          <Eye className="h-4 w-4" />
+                        )}
+                      </button>
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
 
-              {/* Submit Button */}
-              <Button
-                type="submit"
+                {/* Role Selection */}
+                {!isLogin && (
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-700">
+                      Select Role *
+                    </label>
+                    <div className="flex space-x-4">
+                      <Button
+                        type="button"
+                        variant={role === "STUDENT" ? "default" : "outline"}
+                        className="flex-1"
+                        onClick={() => setRole("STUDENT")}
+                      >
+                        Student
+                      </Button>
+                      <Button
+                        type="button"
+                        variant={role === "MENTOR" ? "default" : "outline"}
+                        className="flex-1"
+                        onClick={() => setRole("MENTOR")}
+                      >
+                        Mentor
+                      </Button>
+                    </div>
+                  </div>
+                )}
 
-                className="w-full bg-[#A63D00] hover:bg-[#A63D00]/90 text-white py-3 text-lg font-bold border-4 border-black shadow-[6px_6px_0px_0px_#FFB74D,14px_14px_0px_0px_#000000] hover:shadow-[3px_3px_0px_0px_#FFB74D,7px_7px_0px_0px_#000000] hover:translate-x-1 hover:translate-y-1 transition-all duration-150 uppercase tracking-wider"
-
-            
-              >
-                {isLoading
-                  ? isLogin
-                    ? "Signing In..."
-                    : "Creating Account..."
-                  : isLogin
-                  ? "Sign In"
-                  : "Create Account"}
-              </Button>
-            </form>
+                {/* Submit Button */}
+                <Button
+                  type="submit"
+                  className="w-full bg-[#A63D00] hover:bg-[#A63D00]/90 text-white py-3 text-lg font-bold border-4 border-black shadow-[6px_6px_0px_0px_#FFB74D,14px_14px_0px_0px_#000000] hover:shadow-[3px_3px_0px_0px_#FFB74D,7px_7px_0px_0px_#000000] hover:translate-x-1 hover:translate-y-1 transition-all duration-150 uppercase tracking-wider"
+                >
+                  {isLoading
+                    ? isLogin
+                      ? "Signing In..."
+                      : "Creating Account..."
+                    : isLogin
+                    ? "Sign In"
+                    : "Create Account"}
+                </Button>
+              </form>
+            </div>
 
             {/* Terms and Privacy */}
             {!isLogin && (
@@ -422,7 +433,7 @@ export default function RegisterPage() {
             {/* Features List */}
             <div className="space-y-4 text-left">
               <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-[#A63D00] rounded-full flex items-center justify-center">
+                <div className="w-8 h-8 bg-[#A63D00] rounded-full flex items-center justify-center circle-shadow">
                   <span className="text-white text-sm font-bold">✓</span>
                 </div>
                 <span className="text-[#A63D00] font-medium">
@@ -430,7 +441,7 @@ export default function RegisterPage() {
                 </span>
               </div>
               <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-[#A63D00] rounded-full flex items-center justify-center">
+                <div className="w-8 h-8 bg-[#A63D00] rounded-full flex items-center justify-center circle-shadow">
                   <span className="text-white text-sm font-bold">✓</span>
                 </div>
                 <span className="text-[#A63D00] font-medium">
@@ -438,7 +449,7 @@ export default function RegisterPage() {
                 </span>
               </div>
               <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-[#A63D00] rounded-full flex items-center justify-center">
+                <div className="w-8 h-8 bg-[#A63D00] rounded-full flex items-center justify-center circle-shadow">
                   <span className="text-white text-sm font-bold">✓</span>
                 </div>
                 <span className="text-[#A63D00] font-medium">
@@ -446,7 +457,7 @@ export default function RegisterPage() {
                 </span>
               </div>
               <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-[#A63D00] rounded-full flex items-center justify-center">
+                <div className="w-8 h-8 bg-[#A63D00] rounded-full flex items-center justify-center circle-shadow">
                   <span className="text-white text-sm font-bold">✓</span>
                 </div>
                 <span className="text-[#A63D00] font-medium">

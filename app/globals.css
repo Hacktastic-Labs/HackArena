@@ -196,3 +196,25 @@
 .group:hover .icon-bounce {
   animation: icon-bounce 1s ease-in-out 1;
 }
+
+/* Pop-out effect for home page stat boxes */
+.stat-pop {
+  transition: transform 0.18s cubic-bezier(0.4,0,0.2,1), box-shadow 0.18s cubic-bezier(0.4,0,0.2,1);
+}
+.stat-pop:hover {
+  transform: scale(1.025);
+  box-shadow: 0 8px 32px 0 rgba(0,0,0,0.10), 0 1.5px 6px 0 rgba(0,0,0,0.08);
+  z-index: 2;
+}
+
+/* Input focus glow with #FDE4C3 */
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px #FDE4C3, 0 0 0 1px #000 inset, 0 1px 2px 0 rgba(0,0,0,0.05);
+  border-color: #FDE4C3 !important;
+  transition: box-shadow 0.2s cubic-bezier(0.4,0,0.2,1), border-color 0.2s cubic-bezier(0.4,0,0.2,1);
+}
+
+.circle-shadow {
+  box-shadow: 4px 0 10px 0 rgba(0,0,0,0.10);
+}

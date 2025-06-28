@@ -82,10 +82,19 @@ export default function DashboardPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-[#A63D00] rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-lg">H</span>
+              <img
+                src="/sfinal.png"
+                alt="Synora Logo"
+                className="w-12 h-12 rounded-md shadow object-contain p-0"
+              />
+              <div className="flex flex-col justify-center">
+                <span className="text-2xl font-bold text-gray-900 font-inter leading-tight">
+                  Synora
+                </span>
+                <span className="text-base text-gray-400 leading-tight">
+                  by Hacktastic
+                </span>
               </div>
-              <span className="text-2xl font-bold text-[#A63D00]">HackArena</span>
             </div>
             <div className="flex items-center space-x-4">
               {/* Navigation - Update the bell button */}
