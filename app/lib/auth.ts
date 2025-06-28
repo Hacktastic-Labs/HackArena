@@ -14,4 +14,16 @@ export const auth = betterAuth({
     provider: "postgresql",
   }),
   plugins: [username(), nextCookies()],
+  user: {
+    additionalFields: {
+      role: {
+        type: "string",
+        required: false,
+      },
+    },
+  },
+  session: {
+    expiresIn: 60 * 60 * 24 * 7, // 7 days
+    updateAge: 60 * 60 * 24, // 1 day (will update session every day)
+  },
 });

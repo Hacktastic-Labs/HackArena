@@ -9,8 +9,6 @@ import {
   Mail,
   Lock,
   User,
-  Github,
-  Linkedin,
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
@@ -102,14 +100,8 @@ export default function RegisterPage() {
           setError(result.error.message || "Failed to sign in");
         } else {
           setSuccess("Signed in successfully!");
-          // Check role from the response if available, else fallback to STUDENT
-          // @ts-ignore – BetterAuth typing may not include custom fields
-          const userRole = (result.data?.user?.role as string) || "STUDENT";
-          if (userRole === "MENTOR") {
-            router.push("/dashboard/mentor");
-          } else {
-            router.push("/dashboard");
-          }
+          // Redirect to the dashboard and let client-side routing handle role-based navigation
+          router.push("/dashboard");
         }
       } else {
         // Sign up
@@ -117,13 +109,13 @@ export default function RegisterPage() {
           email: formData.email,
           name: formData.username,
         });
-        const signupPayload: any = {
+        const signupPayload: { email: string; password: string; name: string; role: string } = {
           email: formData.email,
           password: formData.password,
           name: formData.username,
           role,
         };
-        const result = await (signUp.email as any)(signupPayload);
+        const result = await (signUp.email as (payload: typeof signupPayload) => Promise<{ error?: { message: string } }>)(signupPayload);
 
         console.log("Signup result:", result);
         if (result.error) {

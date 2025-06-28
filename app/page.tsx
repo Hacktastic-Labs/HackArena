@@ -1,5 +1,7 @@
 import { Button } from "@/components/ui/button"
-import { ArrowRight, Copy, Github, Users, BookOpen, MessageSquare, TrendingUp, Star, Calendar, LayoutDashboard, Sparkles, Globe } from "lucide-react"
+
+import { ArrowRight, Github, Users, BookOpen, MessageSquare, TrendingUp, Star, Calendar } from "lucide-react"
+
 import Link from "next/link"
 
 export default function HomePage() {

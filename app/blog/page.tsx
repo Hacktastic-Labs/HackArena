@@ -1,3 +1,4 @@
+import React from "react";
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -89,4 +90,15 @@ export default function BlogPage() {
                   <div className="flex items-center space-x-4 text-sm text-gray-600">
                     <div className="flex items-center space-x-1">
                       <Calendar className="h-4 w-4" />
-                      <span>Dec 10\
+                      <span>Dec 10</span>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}

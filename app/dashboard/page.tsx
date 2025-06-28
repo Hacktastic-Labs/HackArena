@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -17,9 +19,62 @@ import {
   Star,
   Clock,
   CheckCircle,
+  Loader2,
 } from "lucide-react"
+import { useSession } from "@/app/lib/auth-client";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useProblems } from "@/app/lib/use-problems";
+import { CreateProblemModal } from "@/components/create-problem-modal";
 
 export default function DashboardPage() {
+  const { data: session, isPending } = useSession();
+  const router = useRouter();
+  const { problems, isLoading: problemsLoading, createProblem } = useProblems();
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+
+  const handleCreateProblem = async (data: { title: string; description: string; tags: string[] }) => {
+    await createProblem(data);
+  };
+
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case 'OPEN':
+        return <Badge className="bg-blue-100 text-blue-800">Open</Badge>;
+      case 'IN_PROGRESS':
+        return <Badge className="bg-orange-100 text-orange-800">In Progress</Badge>;
+      case 'RESOLVED':
+        return <Badge className="bg-green-100 text-green-800"><CheckCircle className="h-3 w-3 mr-1" />Resolved</Badge>;
+      case 'CLOSED':
+        return <Badge className="bg-gray-100 text-gray-800">Closed</Badge>;
+      default:
+        return <Badge className="bg-gray-100 text-gray-800">{status}</Badge>;
+    }
+  };
+
+  useEffect(() => {
+    if (!isPending && !session) {
+      router.push("/register");
+    } else if (!isPending && (session?.user as { role?: string })?.role === "MENTOR") {
+      router.push("/mentor-dashboard");
+    }
+  }, [session, isPending, router]);
+
+  if (isPending) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#FFE8CC]/20">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-[#A63D00]"></div>
+          <p className="mt-4 text-lg text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!session || (session.user as { role?: string })?.role === "MENTOR") {
+    return null;
+  }
+
   return (
     <div className="min-h-screen bg-[#FFE8CC]/20">
       {/* Navigation */}
@@ -28,9 +83,9 @@ export default function DashboardPage() {
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-2">
               <div className="w-8 h-8 bg-[#A63D00] rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-lg">S</span>
+                <span className="text-white font-bold text-lg">H</span>
               </div>
-              <span className="text-2xl font-bold text-[#A63D00]">Synora</span>
+              <span className="text-2xl font-bold text-[#A63D00]">HackArena</span>
             </div>
             <div className="flex items-center space-x-4">
               {/* Navigation - Update the bell button */}
@@ -40,7 +95,9 @@ export default function DashboardPage() {
               </Button>
               <Avatar>
                 <AvatarImage src="/placeholder.svg?height=32&width=32" />
-                <AvatarFallback className="bg-[#A63D00] text-white">JD</AvatarFallback>
+                <AvatarFallback className="bg-[#A63D00] text-white">
+                  {session.user?.name?.charAt(0)?.toUpperCase() || "S"}
+                </AvatarFallback>
               </Avatar>
             </div>
           </div>
@@ -50,8 +107,8 @@ export default function DashboardPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome back, John!</h1>
-          <p className="text-gray-600">Here's what's happening with your learning journey today.</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome back, {session.user?.name || "Student"}!</h1>
+          <p className="text-gray-600">Here&apos;s what&apos;s happening with your learning journey today.</p>
         </div>
 
         {/* Quick Stats */}
@@ -128,95 +185,101 @@ export default function DashboardPage() {
           <TabsContent value="problems" className="space-y-6">
             <div className="flex justify-between items-center">
               <h2 className="text-2xl font-bold text-gray-900">My Problems</h2>
-              <Button className="bg-[#A63D00] hover:bg-[#A63D00]/90">
+              <Button 
+                className="bg-[#A63D00] hover:bg-[#A63D00]/90"
+                onClick={() => setIsCreateModalOpen(true)}
+              >
                 <Plus className="h-4 w-4 mr-2" />
                 Post New Problem
               </Button>
             </div>
 
             <div className="space-y-4">
-              {/* Update problem cards with colored tags based on complexity */}
-              <Card className="border-[#A63D00]/20">
-                <CardHeader>
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <CardTitle className="text-lg">React State Management Issue</CardTitle>
-                      <CardDescription className="mt-2">
-                        Having trouble with complex state updates in my React application...
-                      </CardDescription>
-                    </div>
-                    <Badge className="bg-orange-100 text-orange-800">In Progress</Badge>
-                  </div>
-                  <div className="flex items-center space-x-4 mt-4">
-                    <Badge className="bg-[#FF6B35] text-white">React</Badge>
-                    <Badge className="bg-[#4ECDC4] text-white">JavaScript</Badge>
-                    <Badge className="bg-[#A63D00] text-white">State Management</Badge>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-4">
-                      <div className="flex items-center space-x-2">
-                        <Avatar className="h-6 w-6">
-                          <AvatarImage src="/placeholder.svg?height=24&width=24" />
-                          <AvatarFallback className="bg-[#A63D00] text-white text-xs">SM</AvatarFallback>
-                        </Avatar>
-                        <span className="text-sm text-gray-600">Sarah Miller (Mentor)</span>
-                      </div>
-                      <div className="flex items-center space-x-1">
-                        <Star className="h-4 w-4 text-yellow-400 fill-current" />
-                        <span className="text-sm text-gray-600">4.9</span>
-                      </div>
-                    </div>
-                    <Button variant="outline" size="sm" className="border-[#A63D00] text-[#A63D00] bg-transparent">
-                      <MessageSquare className="h-4 w-4 mr-2" />
-                      Chat
+              {problemsLoading ? (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="h-8 w-8 animate-spin text-[#A63D00]" />
+                  <span className="ml-2 text-gray-600">Loading your problems...</span>
+                </div>
+              ) : problems.length === 0 ? (
+                <Card className="border-[#A63D00]/20">
+                  <CardContent className="text-center py-8">
+                    <MessageSquare className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">No problems yet</h3>
+                    <p className="text-gray-600 mb-4">
+                      Start by posting your first problem to get help from our community of mentors.
+                    </p>
+                    <Button 
+                      className="bg-[#A63D00] hover:bg-[#A63D00]/90"
+                      onClick={() => setIsCreateModalOpen(true)}
+                    >
+                      <Plus className="h-4 w-4 mr-2" />
+                      Post Your First Problem
                     </Button>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="border-[#A63D00]/20">
-                <CardHeader>
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <CardTitle className="text-lg">Database Design for E-commerce</CardTitle>
-                      <CardDescription className="mt-2">
-                        Need help designing a scalable database schema for an e-commerce platform...
-                      </CardDescription>
-                    </div>
-                    <Badge className="bg-green-100 text-green-800">
-                      <CheckCircle className="h-3 w-3 mr-1" />
-                      Resolved
-                    </Badge>
-                  </div>
-                  <div className="flex items-center space-x-4 mt-4">
-                    <Badge className="bg-[#8B3400] text-white">Database</Badge>
-                    <Badge className="bg-[#FF6B35] text-white">SQL</Badge>
-                    <Badge className="bg-[#4ECDC4] text-white">Architecture</Badge>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-4">
-                      <div className="flex items-center space-x-2">
-                        <Avatar className="h-6 w-6">
-                          <AvatarImage src="/placeholder.svg?height=24&width=24" />
-                          <AvatarFallback className="bg-[#A63D00] text-white text-xs">MJ</AvatarFallback>
-                        </Avatar>
-                        <span className="text-sm text-gray-600">Mike Johnson (Mentor)</span>
+                  </CardContent>
+                </Card>
+              ) : (
+                problems.map((problem) => (
+                  <Card key={problem.id} className="border-[#A63D00]/20">
+                    <CardHeader>
+                      <div className="flex justify-between items-start">
+                        <div className="flex-1">
+                          <CardTitle className="text-lg">{problem.title}</CardTitle>
+                          <CardDescription className="mt-2">
+                            {problem.description.length > 150 
+                              ? `${problem.description.substring(0, 150)}...` 
+                              : problem.description}
+                          </CardDescription>
+                        </div>
+                        {getStatusBadge(problem.status)}
                       </div>
-                      <div className="flex items-center space-x-1">
-                        <Star className="h-4 w-4 text-yellow-400 fill-current" />
-                        <span className="text-sm text-gray-600">4.8</span>
+                      {problem.tags.length > 0 && (
+                        <div className="flex items-center space-x-2 mt-4 flex-wrap gap-2">
+                          {problem.tags.map((tag, index) => (
+                            <Badge 
+                              key={index} 
+                              className="bg-[#FF6B35] text-white"
+                            >
+                              {tag}
+                            </Badge>
+                          ))}
+                        </div>
+                      )}
+                    </CardHeader>
+                    <CardContent>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-4">
+                          <div className="text-sm text-gray-600">
+                            Created {new Date(problem.createdAt).toLocaleDateString()}
+                          </div>
+                          {problem.mentor && (
+                            <div className="flex items-center space-x-2">
+                              <Avatar className="h-6 w-6">
+                                <AvatarImage src={problem.mentor.image || "/placeholder.svg?height=24&width=24"} />
+                                <AvatarFallback className="bg-[#A63D00] text-white text-xs">
+                                  {problem.mentor.name?.charAt(0)?.toUpperCase() || 'M'}
+                                </AvatarFallback>
+                              </Avatar>
+                              <span className="text-sm text-gray-600">{problem.mentor.name} (Mentor)</span>
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex space-x-2">
+                          {problem.mentor ? (
+                            <Button variant="outline" size="sm" className="border-[#A63D00] text-[#A63D00] bg-transparent">
+                              <MessageSquare className="h-4 w-4 mr-2" />
+                              Chat
+                            </Button>
+                          ) : (
+                            <Button variant="outline" size="sm" className="border-[#A63D00] text-[#A63D00] bg-transparent">
+                              Find Mentor
+                            </Button>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                    <Button variant="outline" size="sm" className="border-[#A63D00] text-[#A63D00] bg-transparent">
-                      View Solution
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
+                    </CardContent>
+                  </Card>
+                ))
+              )}
             </div>
           </TabsContent>
 
@@ -473,7 +536,7 @@ export default function DashboardPage() {
                     <div>
                       <CardTitle className="text-lg">New AI-Powered Mentor Matching</CardTitle>
                       <CardDescription className="mt-2">
-                        We've upgraded our mentor matching algorithm to provide even better suggestions based on your
+                        We&apos;ve upgraded our mentor matching algorithm to provide even better suggestions based on your
                         learning goals and preferences.
                       </CardDescription>
                     </div>
@@ -512,6 +575,12 @@ export default function DashboardPage() {
           </TabsContent>
         </Tabs>
       </div>
+      
+      <CreateProblemModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        onSubmit={handleCreateProblem}
+      />
     </div>
   )
 }
