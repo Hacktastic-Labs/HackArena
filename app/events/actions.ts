@@ -52,6 +52,22 @@ export async function createEvent(prevState: any, formData: FormData) {
       },
     });
 
+    // Create an announcement for the newly created event
+    try {
+      await prisma.announcement.create({
+        data: {
+          title: `New Event: ${newEvent.title}`,
+          description: newEvent.description ?? undefined,
+          category: "EVENTS",
+          createdById: session.user.id,
+          eventId: newEvent.id,
+        },
+      });
+    } catch (announceErr) {
+      console.error("Failed to create event announcement:", announceErr);
+      // Do not fail the whole flow if announcement fails
+    }
+
     revalidatePath("/events");
 
     return { success: true, data: newEvent };

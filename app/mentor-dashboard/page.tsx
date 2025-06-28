@@ -19,11 +19,13 @@ import {
   CheckCircle,
   Clock,
   LogOut,
+  Megaphone,
 } from "lucide-react";
 import { useSession, signOut } from "@/app/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useMentorProblems } from "@/app/lib/use-mentor-problems";
+import { CreateAnnouncementModal } from "@/components/create-announcement-modal";
 
 export default function MentorDashboardPage() {
   const { data: session, isPending } = useSession();
@@ -34,6 +36,7 @@ export default function MentorDashboardPage() {
     isLoading: problemsLoading,
     assignMentorToProblem,
   } = useMentorProblems();
+  const [isAnnModalOpen, setIsAnnModalOpen] = React.useState(false);
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -119,7 +122,6 @@ export default function MentorDashboardPage() {
               <img
                 src="/sfinal.png"
                 alt="Synora Logo"
-
                 className="w-12 h-12 rounded-md shadow object-contain p-0"
               />
               <div className="flex flex-col justify-center">
@@ -130,9 +132,16 @@ export default function MentorDashboardPage() {
                   by Hacktastic
                 </span>
               </div>
-
             </div>
             <div className="flex items-center space-x-4">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsAnnModalOpen(true)}
+                className="group relative"
+              >
+                <Megaphone className="h-4 w-4 group-hover:fill-[#A63D00] group-hover:text-[#A63D00] transition-all duration-300" />
+              </Button>
               <Button variant="ghost" size="sm" className="group relative">
                 <Bell className="h-4 w-4 group-hover:fill-[#A63D00] group-hover:text-[#A63D00] transition-all duration-300 group-hover:animate-pulse" />
                 <div className="absolute -top-1 -right-1 w-3 h-3 bg-[#A63D00] rounded-full group-hover:animate-ping"></div>
@@ -447,6 +456,11 @@ export default function MentorDashboardPage() {
           </div>
         </div>
       </div>
+      <CreateAnnouncementModal
+        isOpen={isAnnModalOpen}
+        onClose={() => setIsAnnModalOpen(false)}
+        onCreated={() => window.location.reload()}
+      />
     </div>
   );
 }
