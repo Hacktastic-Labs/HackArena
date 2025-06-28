@@ -1,9 +1,9 @@
-import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
+import { NextResponse, NextRequest } from "next/server";
+import { PrismaClient } from "@/app/generated/prisma";
 
 const prisma = new PrismaClient();
 
-export async function GET() {
+export async function GET(_request: NextRequest) {
   console.log("Fetching mentors from /api/mentors...");
   try {
     const mentors = await prisma.user.findMany({
