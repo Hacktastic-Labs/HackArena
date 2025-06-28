@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+
 import {
   Plus,
   MessageSquare,
@@ -14,30 +15,68 @@ import {
   Bell,
   CheckCircle,
   Loader2,
+
   ArrowRight,
   User,
   Megaphone,
 } from "lucide-react"
 import { useSession } from "@/app/lib/auth-client";
+
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useProblems } from "@/app/lib/use-problems";
 import { CreateProblemModal } from "@/components/create-problem-modal";
+
+interface Mentor {
+  id: string;
+  name: string;
+  email: string;
+  image?: string;
+  // Add other mentor properties as needed from your schema
+}
 
 export default function DashboardPage() {
   const { data: session, isPending } = useSession();
   const router = useRouter();
   const { problems, isLoading: problemsLoading, createProblem } = useProblems();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [mentors, setMentors] = useState<Mentor[]>([]);
+  const [mentorsLoading, setMentorsLoading] = useState(true);
 
-  const handleCreateProblem = async (data: { title: string; description: string; tags: string[] }) => {
+  useEffect(() => {
+    const fetchMentors = async () => {
+      try {
+        const response = await fetch("/api/mentors");
+        if (response.ok) {
+          const data = await response.json();
+          setMentors(data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch mentors", error);
+      } finally {
+        setMentorsLoading(false);
+      }
+    };
+
+    fetchMentors();
+  }, []);
+
+  const handleCreateProblem = async (data: {
+    title: string;
+    description: string;
+    tags: string[];
+  }) => {
     await createProblem(data);
   };
+
 
   useEffect(() => {
     if (!isPending && !session) {
       router.push("/register");
-    } else if (!isPending && (session?.user as { role?: string })?.role === "MENTOR") {
+    } else if (
+      !isPending &&
+      (session?.user as { role?: string })?.role === "MENTOR"
+    ) {
       router.push("/mentor-dashboard");
     }
   }, [session, isPending, router]);
@@ -64,10 +103,12 @@ export default function DashboardPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-[#A63D00] rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-lg">H</span>
-              </div>
-              <span className="text-2xl font-bold text-[#A63D00]">HackArena</span>
+              <img
+                src="/sfinal.png"
+                alt="Synora Logo"
+                className="w-10 h-10 rounded-md shadow object-contain p-0"
+              />
+              <span className="text-2xl font-bold text-[#A63D00]">Synora</span>
             </div>
             <div className="flex items-center space-x-4">
               <Button variant="ghost" size="sm" onClick={() => router.push("/dashboard")} className="bg-[#A63D00]/10 text-[#A63D00]">
@@ -98,6 +139,17 @@ export default function DashboardPage() {
                   {session.user?.name?.charAt(0)?.toUpperCase() || "S"}
                 </AvatarFallback>
               </Avatar>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={async () => {
+                  await signOut();
+                  router.push("/register");
+                }}
+                className="group relative"
+              >
+                <LogOut className="h-4 w-4 group-hover:fill-[#A63D00] group-hover:text-[#A63D00] transition-all duration-300 group-hover:animate-pulse" />
+              </Button>
             </div>
           </div>
         </div>
@@ -106,15 +158,21 @@ export default function DashboardPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome back, {session.user?.name || "Student"}!</h1>
-          <p className="text-gray-600">Here&apos;s what&apos;s happening with your learning journey today.</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            Welcome back, {session.user?.name || "Student"}!
+          </h1>
+          <p className="text-gray-600">
+            Here&apos;s what&apos;s happening with your learning journey today.
+          </p>
         </div>
 
         {/* Quick Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <Card className="border-[#A63D00]/20 hover:scale-105 transition-transform duration-300 cursor-pointer" onClick={() => router.push("/problems")}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Active Problems</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Active Problems
+              </CardTitle>
               <MessageSquare className="h-4 w-4 text-[#A63D00]" />
             </CardHeader>
             <CardContent>
@@ -125,7 +183,9 @@ export default function DashboardPage() {
 
           <Card className="border-[#A63D00]/20 hover:scale-105 transition-transform duration-300 cursor-pointer" onClick={() => router.push("/mentors")}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+
               <CardTitle className="text-sm font-medium">Mentors Available</CardTitle>
+
               <Users className="h-4 w-4 text-[#A63D00]" />
             </CardHeader>
             <CardContent>
@@ -136,7 +196,9 @@ export default function DashboardPage() {
 
           <Card className="border-[#A63D00]/20 hover:scale-105 transition-transform duration-300 cursor-pointer" onClick={() => router.push("/events")}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+
               <CardTitle className="text-sm font-medium">Upcoming Events</CardTitle>
+
               <Calendar className="h-4 w-4 text-[#A63D00]" />
             </CardHeader>
             <CardContent>
@@ -147,7 +209,9 @@ export default function DashboardPage() {
 
           <Card className="border-[#A63D00]/20 hover:scale-105 transition-transform duration-300 cursor-pointer" onClick={() => router.push("/knowledge")}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Knowledge Points</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Knowledge Points
+              </CardTitle>
               <TrendingUp className="h-4 w-4 text-[#A63D00]" />
             </CardHeader>
             <CardContent>
@@ -156,6 +220,7 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
         </div>
+
 
         {/* Navigation Cards */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
@@ -193,6 +258,7 @@ export default function DashboardPage() {
               <div className="flex-1">
                 <CardTitle className="text-xl">Find Mentors</CardTitle>
                 <CardDescription>Connect with experienced professionals for guidance</CardDescription>
+
               </div>
               <ArrowRight className="h-5 w-5 text-gray-400" />
             </CardHeader>
@@ -244,6 +310,7 @@ export default function DashboardPage() {
           </Card>
         </div>
 
+
         {/* Recent Activity */}
         <div className="mb-8">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">Recent Activity</h2>
@@ -255,6 +322,7 @@ export default function DashboardPage() {
               </div>
             ) : problems.length === 0 ? (
               <Card className="border-[#A63D00]/20">
+
                 <CardContent className="text-center py-8">
                   <MessageSquare className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                   <h3 className="text-lg font-semibold text-gray-900 mb-2">No recent activity</h3>
@@ -276,10 +344,12 @@ export default function DashboardPage() {
                     >
                       <BookOpen className="h-4 w-4 mr-2" />
                       Browse Knowledge
+
                     </Button>
                   </div>
                 </CardContent>
               </Card>
+
             ) : (
               problems.slice(0, 3).map((problem) => (
                 <Card key={problem.id} className="border-[#A63D00]/20 hover:shadow-sm transition-shadow cursor-pointer" onClick={() => router.push("/problems")}>
@@ -312,22 +382,25 @@ export default function DashboardPage() {
                             </Badge>
                           ))}
                         </div>
+
                       </div>
                       <ArrowRight className="h-5 w-5 text-gray-400 ml-4" />
                     </div>
+
                   </CardContent>
                 </Card>
               ))
             )}
           </div>
         </div>
+
       </div>
-      
+
       <CreateProblemModal
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
         onSubmit={handleCreateProblem}
       />
     </div>
-  )
+  );
 }

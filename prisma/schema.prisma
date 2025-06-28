@@ -51,6 +51,11 @@ model User {
   problems        Problem[]      @relation("StudentProblems")  // Problems posted by this user
   mentoredProblems Problem[]     @relation("MentorProblems")   // Problems this user is mentoring
   
+  // Chat System relationships
+  studentConversations Conversation[] @relation("StudentConversations")
+  mentorConversations  Conversation[] @relation("MentorConversations")
+  sentMessages         Message[]      @relation("SentMessages")
+  
   @@map("users")
 }
 
@@ -150,8 +155,45 @@ model Problem {
   mentorId    String?       @map("mentor_id") // Optional mentor assigned to help
   mentor      User?         @relation("MentorProblems", fields: [mentorId], references: [id], onDelete: SetNull)
   
+  // Chat
+  conversations Conversation[]
+  
   @@index([userId])
   @@index([mentorId])
   @@index([status])
   @@map("problems")
+}
+
+model Conversation {
+  id        String   @id @default(cuid())
+  problemId String   @map("problem_id")
+  studentId String   @map("student_id")
+  mentorId  String   @map("mentor_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  problem  Problem      @relation(fields: [problemId], references: [id], onDelete: Cascade)
+  student  User         @relation("StudentConversations", fields: [studentId], references: [id], onDelete: Cascade)
+  mentor   User         @relation("MentorConversations", fields: [mentorId], references: [id], onDelete: Cascade)
+  messages Message[]
+
+  @@unique([problemId, studentId, mentorId])
+  @@index([problemId])
+  @@index([studentId])
+  @@index([mentorId])
+  @@map("conversations")
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  content        String
+  createdAt      DateTime     @default(now()) @map("created_at")
+  senderId       String       @map("sender_id")
+  sender         User         @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
+  conversationId String       @map("conversation_id")
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@index([senderId])
+  @@index([conversationId])
+  @@map("messages")
 }
