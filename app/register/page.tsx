@@ -379,8 +379,10 @@ export default function RegisterPage() {
               {/* Submit Button */}
               <Button
                 type="submit"
-                disabled={isLoading}
-                className="w-full bg-[#A63D00] hover:bg-[#A63D00]/90 text-white py-3 text-lg font-bold border-4 border-black shadow-[4px_4px_0px_0px_#000000] hover:shadow-[2px_2px_0px_0px_#000000] hover:translate-x-1 hover:translate-y-1 transition-all duration-150 uppercase tracking-wider disabled:opacity-50 disabled:cursor-not-allowed"
+
+                className="w-full bg-[#A63D00] hover:bg-[#A63D00]/90 text-white py-3 text-lg font-bold border-4 border-black shadow-[6px_6px_0px_0px_#FFB74D,14px_14px_0px_0px_#000000] hover:shadow-[3px_3px_0px_0px_#FFB74D,7px_7px_0px_0px_#000000] hover:translate-x-1 hover:translate-y-1 transition-all duration-150 uppercase tracking-wider"
+
+            
               >
                 {isLoading
                   ? isLogin
