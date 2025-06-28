@@ -2,14 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  ArrowLeft,
-  Eye,
-  EyeOff,
-  Mail,
-  Lock,
-  User,
-} from "lucide-react";
+import { ArrowLeft, Eye, EyeOff, Mail, Lock, User } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { signIn, signUp } from "@/app/lib/auth-client";
@@ -109,13 +102,22 @@ export default function RegisterPage() {
           email: formData.email,
           name: formData.username,
         });
-        const signupPayload: { email: string; password: string; name: string; role: string } = {
+        const signupPayload: {
+          email: string;
+          password: string;
+          name: string;
+          role: string;
+        } = {
           email: formData.email,
           password: formData.password,
           name: formData.username,
           role,
         };
-        const result = await (signUp.email as (payload: typeof signupPayload) => Promise<{ error?: { message: string } }>)(signupPayload);
+        const result = await (
+          signUp.email as (
+            payload: typeof signupPayload
+          ) => Promise<{ error?: { message: string } }>
+        )(signupPayload);
 
         console.log("Signup result:", result);
         if (result.error) {
@@ -146,14 +148,18 @@ export default function RegisterPage() {
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-3">
               <Link href="/" className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-[#A63D00] rounded-xl flex items-center justify-center">
-                  <span className="text-white font-bold text-xl">H</span>
-                </div>
+                <img
+                  src="/sfinal.png"
+                  alt="Synora Logo"
+                  className="w-10 h-10 rounded-md shadow object-contain p-0"
+                />
                 <div>
                   <span className="text-2xl font-bold text-gray-900">
-                    HackArena
+                    Synora
                   </span>
-                  <span className="text-sm text-gray-500 ml-2">IIIT Delhi</span>
+                  <span className="text-sm text-gray-500 ml-2">
+                    by Hacktastic
+                  </span>
                 </div>
               </Link>
             </div>
@@ -179,12 +185,12 @@ export default function RegisterPage() {
           <div className="w-full max-w-md space-y-8">
             <div className="text-center">
               <h2 className="text-4xl font-bold text-gray-900 mb-2">
-                {isLogin ? "Welcome Back!" : "Join HackArena"}
+                {isLogin ? "Welcome Back!" : "Join Synora"}
               </h2>
               <p className="text-gray-600">
                 {isLogin
-                  ? "Sign in to continue your hacking journey"
-                  : "Start your competitive programming adventure"}
+                  ? "Sign in to continue your journey"
+                  : "Start your adventure with us"}
               </p>
             </div>
 
@@ -371,10 +377,7 @@ export default function RegisterPage() {
               {/* Submit Button */}
               <Button
                 type="submit"
-
                 className="w-full bg-[#A63D00] hover:bg-[#A63D00]/90 text-white py-3 text-lg font-bold border-4 border-black shadow-[6px_6px_0px_0px_#FFB74D,14px_14px_0px_0px_#000000] hover:shadow-[3px_3px_0px_0px_#FFB74D,7px_7px_0px_0px_#000000] hover:translate-x-1 hover:translate-y-1 transition-all duration-150 uppercase tracking-wider"
-
-            
               >
                 {isLoading
                   ? isLogin
