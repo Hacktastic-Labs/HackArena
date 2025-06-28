@@ -221,7 +221,7 @@ export default function HomePage() {
         <div className="max-w-screen-2xl w-full mx-auto">
           <div className="grid grid-cols-4 grid-rows-2 gap-4 h-80">
             {/* Large box - Active Students */}
-            <div className="col-span-2 row-span-2 bg-gradient-to-br from-[#A63D00] to-[#8B3400] rounded-2xl p-8 text-white relative overflow-hidden">
+            <div className="stat-pop col-span-2 row-span-2 bg-gradient-to-br from-[#A63D00] to-[#8B3400] rounded-2xl p-8 text-white relative overflow-hidden">
               <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16"></div>
               <div className="relative z-10">
                 <div className="text-5xl font-black mb-3">2,500+</div>
@@ -233,7 +233,7 @@ export default function HomePage() {
             </div>
 
             {/* Top right - Expert Mentors */}
-            <div className="col-span-2 bg-gradient-to-br from-[#FFE8CC] to-[#F4D4A7] rounded-2xl p-6 text-[#A63D00] relative overflow-hidden">
+            <div className="stat-pop col-span-2 bg-gradient-to-br from-[#FFE8CC] to-[#F4D4A7] rounded-2xl p-6 text-[#A63D00] relative overflow-hidden">
               <div className="absolute bottom-0 left-0 w-24 h-24 bg-[#A63D00]/10 rounded-full translate-y-12 -translate-x-12"></div>
               <div className="relative z-10">
                 <div className="text-4xl font-black mb-2">850+</div>
@@ -242,7 +242,7 @@ export default function HomePage() {
             </div>
 
             {/* Bottom left - Problems Solved */}
-            <div className="bg-gradient-to-br from-[#FF6B35] to-[#E55A2B] rounded-2xl p-6 text-white relative overflow-hidden">
+            <div className="stat-pop bg-gradient-to-br from-[#FF6B35] to-[#E55A2B] rounded-2xl p-6 text-white relative overflow-hidden">
               <div className="absolute top-0 right-0 w-20 h-20 bg-white/20 rounded-full -translate-y-10 translate-x-10"></div>
               <div className="relative z-10">
                 <div className="text-3xl font-black mb-2">15K+</div>
@@ -251,7 +251,7 @@ export default function HomePage() {
             </div>
 
             {/* Bottom right - Success Rate */}
-            <div className="bg-gradient-to-br from-[#FFB74D] to-[#FF9800] rounded-2xl p-6 text-white relative overflow-hidden">
+            <div className="stat-pop bg-gradient-to-br from-[#FFB74D] to-[#FF9800] rounded-2xl p-6 text-white relative overflow-hidden">
               <div className="absolute bottom-0 left-0 w-16 h-16 bg-white/20 rounded-full translate-y-8 -translate-x-8"></div>
               <div className="relative z-10">
                 <div className="text-3xl font-black mb-2">98%</div>
@@ -318,8 +318,10 @@ export default function HomePage() {
       <div className="w-full overflow-hidden leading-none"></div>
 
       {/* CTA Section */}
-      <section className="py-12 px-4 sm:px-6 lg:px-8 bg-[#B34700]">
-        <div className="max-w-4xl mx-auto text-center">
+      <section className="relative py-12 px-4 sm:px-6 lg:px-8 bg-[#B34700]">
+        {/* Flat yellow strip at the top */}
+        <div className="absolute left-0 top-0 w-full" style={{zIndex:2, height:'14px', background:'#FFB74D', pointerEvents:'none'}}></div>
+        <div className="max-w-4xl mx-auto text-center relative z-10">
           <h2 className="text-4xl font-bold text-white mb-6">
             Ready to transform your learning?
           </h2>
@@ -350,9 +352,7 @@ export default function HomePage() {
           <div className="grid md:grid-cols-4 gap-8">
             <div>
               <div className="flex items-center space-x-2 mb-4">
-                <div className="w-8 h-8 bg-[#A63D00] rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-lg">S</span>
-                </div>
+                <img src="/sfinal.png" alt="Synora Logo" className="w-8 h-8 rounded-lg object-contain" />
                 <span className="text-2xl font-bold">Synora</span>
               </div>
               <p className="text-gray-400">

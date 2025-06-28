@@ -119,11 +119,18 @@ export default function MentorDashboardPage() {
               <img
                 src="/sfinal.png"
                 alt="Synora Logo"
-                className="w-10 h-10 rounded-md shadow object-contain p-0"
+
+                className="w-12 h-12 rounded-md shadow object-contain p-0"
               />
-              <span className="text-2xl font-bold text-[#A63D00]">
-                Synora - Mentor
-              </span>
+              <div className="flex flex-col justify-center">
+                <span className="text-2xl font-bold text-gray-900 font-inter leading-tight">
+                  Synora
+                </span>
+                <span className="text-base text-gray-400 leading-tight">
+                  by Hacktastic
+                </span>
+              </div>
+
             </div>
             <div className="flex items-center space-x-4">
               <Button variant="ghost" size="sm" className="group relative">
