@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -18,8 +20,37 @@ import {
   Clock,
   CheckCircle,
 } from "lucide-react"
+import { useSession } from "@/app/lib/auth-client";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function DashboardPage() {
+  const { data: session, isPending } = useSession();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isPending && !session) {
+      router.push("/register");
+    } else if (!isPending && (session?.user as { role?: string })?.role === "MENTOR") {
+      router.push("/mentor-dashboard");
+    }
+  }, [session, isPending, router]);
+
+  if (isPending) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#FFE8CC]/20">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-[#A63D00]"></div>
+          <p className="mt-4 text-lg text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!session || (session.user as { role?: string })?.role === "MENTOR") {
+    return null;
+  }
+
   return (
     <div className="min-h-screen bg-[#FFE8CC]/20">
       {/* Navigation */}
@@ -28,9 +59,9 @@ export default function DashboardPage() {
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-2">
               <div className="w-8 h-8 bg-[#A63D00] rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-lg">S</span>
+                <span className="text-white font-bold text-lg">H</span>
               </div>
-              <span className="text-2xl font-bold text-[#A63D00]">Synora</span>
+              <span className="text-2xl font-bold text-[#A63D00]">HackArena</span>
             </div>
             <div className="flex items-center space-x-4">
               {/* Navigation - Update the bell button */}
@@ -40,7 +71,9 @@ export default function DashboardPage() {
               </Button>
               <Avatar>
                 <AvatarImage src="/placeholder.svg?height=32&width=32" />
-                <AvatarFallback className="bg-[#A63D00] text-white">JD</AvatarFallback>
+                <AvatarFallback className="bg-[#A63D00] text-white">
+                  {session.user?.name?.charAt(0)?.toUpperCase() || "S"}
+                </AvatarFallback>
               </Avatar>
             </div>
           </div>
@@ -50,8 +83,8 @@ export default function DashboardPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome back, John!</h1>
-          <p className="text-gray-600">Here's what's happening with your learning journey today.</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome back, {session.user?.name || "Student"}!</h1>
+          <p className="text-gray-600">Here&apos;s what&apos;s happening with your learning journey today.</p>
         </div>
 
         {/* Quick Stats */}
@@ -473,7 +506,7 @@ export default function DashboardPage() {
                     <div>
                       <CardTitle className="text-lg">New AI-Powered Mentor Matching</CardTitle>
                       <CardDescription className="mt-2">
-                        We've upgraded our mentor matching algorithm to provide even better suggestions based on your
+                        We&apos;ve upgraded our mentor matching algorithm to provide even better suggestions based on your
                         learning goals and preferences.
                       </CardDescription>
                     </div>

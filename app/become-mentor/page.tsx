@@ -54,7 +54,7 @@ export default function BecomeMentorPage() {
                   <span className="text-[#A63D00]">Mentor</span>
                 </h1>
                 <p className="text-xl text-gray-600 max-w-lg">
-                  Share your expertise, inspire the next generation, and make a lasting impact on students' careers while growing your professional network.
+                  Share your expertise, inspire the next generation, and make a lasting impact on students&apos; careers while growing your professional network.
                 </p>
               </div>
 
@@ -319,7 +319,7 @@ export default function BecomeMentorPage() {
               <div className="space-y-6">
                 <h2 className="text-4xl font-bold text-gray-900">Mentor Requirements</h2>
                 <p className="text-xl text-gray-600">
-                  We're looking for passionate professionals who want to make a difference. Here's what we expect from our mentors:
+                  We&apos;re looking for passionate professionals who want to make a difference. Here&apos;s what we expect from our mentors:
                 </p>
               </div>
 
