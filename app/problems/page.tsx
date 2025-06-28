@@ -197,7 +197,12 @@ export default function ProblemsPage() {
                     </div>
                     <div className="flex space-x-2">
                       {problem.mentor ? (
-                        <Button variant="outline" size="sm" className="border-[#A63D00] text-[#A63D00] bg-transparent">
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="border-[#A63D00] text-[#A63D00] bg-transparent"
+                          onClick={() => router.push(`/problems/${problem.id}`)}
+                        >
                           <MessageSquare className="h-4 w-4 mr-2" />
                           Chat
                         </Button>
