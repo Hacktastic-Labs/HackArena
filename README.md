@@ -1,36 +1,104 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🚀 Hacktastic Platform
 
-## Getting Started
+An intelligent community-driven platform to streamline hackathon participation, knowledge sharing, and student-mentor interaction — powered by smart AI features.
 
-First, run the development server:
+## 👥 Team Hacktastic
+
+- **Aditya Kotnala**  
+- **Anmol Pandey**  
+- **Pranay Sharma**  
+- **Pushkar Aggarwal**
+
+---
+
+## 🔍 Problem Statement
+
+Communities and hackathon ecosystems often suffer from repeated questions, scattered resources, low engagement, and inefficient mentor access. This leads to wasted time, lost knowledge, and demotivated participants.
+
+---
+
+## 🌟 Feature Set
+
+### 🧠 1) Smart Knowledge Management + Past Hack Archive
+
+- Smart tagging and categorization of content  
+- AI-generated summaries for long threads  
+- Auto-detection of duplicate/similar questions  
+- Semantic AI-powered search  
+- Technical insights into previous winning projects  
+- Trend analysis across hackathons  
+- AI chat assistant for idea suggestions and validation  
+
+---
+
+### 📣 2) Announcements and Updates
+
+- Personalized announcement targeting  
+- AI-based content optimization for higher engagement  
+- Urgency detection and dynamic prioritization of updates  
+
+---
+
+### ✍️ 3) Blog System
+
+- Community-contributed blogs  
+- Admin approval system  
+- Published blogs appear with rich formatting and tags  
+
+---
+
+### 🎟️ 4) Event Registration System
+
+#### For Organizers:
+- Quick event setup  
+- Manage participants and check-ins  
+- Analytics for engagement tracking  
+
+#### For Participants:
+- One-click registration  
+- Smart event recommendations  
+
+#### For All Users:
+- Browse event history  
+- Discover upcoming events  
+
+---
+
+### 🤝 5) Student-Mentor Interaction
+
+- AI-tagged problem submission by students  
+- Mentor recommendations based on problem domain  
+- Chat and call integration for sessions  
+- Mentor profiles with availability info  
+
+---
+
+## 🛠️ Tech Stack (Suggested / In Use)
+
+- **Frontend:** React, TailwindCSS  
+- **Backend:** Node.js / Flask  
+- **AI/NLP:** OpenAI API, Vector Search (e.g., Pinecone / FAISS)  
+- **Database:** MongoDB / PostgreSQL  
+- **Authentication:** Firebase Auth / OAuth  
+- **Deployment:** Vercel / Render / Railway  
+
+---
+
+## 📦 How to Run the Project
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+# Clone the repository
+git clone https://github.com/<your-repo-link>.git
+cd hacktastic-platform
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+# Install dependencies (example: for frontend)
+cd frontend
+npm install
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+# Run the frontend
+npm start
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+# Run backend (in separate terminal)
+cd backend
+pip install -r requirements.txt
+python app.py
