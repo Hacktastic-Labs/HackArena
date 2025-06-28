@@ -16,10 +16,23 @@ import { Textarea } from "@/components/ui/textarea"; // Assuming you have a Text
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 
+type FormState = {
+  success: boolean;
+  error: string | null;
+  errors: {
+    title?: string[];
+    description?: string[];
+    date?: string[];
+    location?: string[];
+  } | null;
+  data?: any;
+};
+
 const initialState = {
   success: false,
-  error: null,
-  errors: null,
+  error: "",
+  errors: {},
+  data: undefined,
 };
 
 function SubmitButton() {

@@ -34,6 +34,9 @@ export default function RegisterPage() {
     confirmPassword: "",
   });
 
+  // Role selection (STUDENT by default)
+  const [role, setRole] = useState<"STUDENT" | "MENTOR">("STUDENT");
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
@@ -70,6 +73,11 @@ export default function RegisterPage() {
       return false;
     }
 
+    if (!role) {
+      setError("Please select a role");
+      return false;
+    }
+
     return true;
   };
 
@@ -94,7 +102,14 @@ export default function RegisterPage() {
           setError(result.error.message || "Failed to sign in");
         } else {
           setSuccess("Signed in successfully!");
-          router.push("/dashboard");
+          // Check role from the response if available, else fallback to STUDENT
+          // @ts-ignore – BetterAuth typing may not include custom fields
+          const userRole = (result.data?.user?.role as string) || "STUDENT";
+          if (userRole === "MENTOR") {
+            router.push("/dashboard/mentor");
+          } else {
+            router.push("/dashboard");
+          }
         }
       } else {
         // Sign up
@@ -102,11 +117,13 @@ export default function RegisterPage() {
           email: formData.email,
           name: formData.username,
         });
-        const result = await signUp.email({
+        const signupPayload: any = {
           email: formData.email,
           password: formData.password,
           name: formData.username,
-        });
+          role,
+        };
+        const result = await (signUp.email as any)(signupPayload);
 
         console.log("Signup result:", result);
         if (result.error) {
@@ -328,6 +345,33 @@ export default function RegisterPage() {
                         <Eye className="h-4 w-4" />
                       )}
                     </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Role Selection */}
+              {!isLogin && (
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700">
+                    Select Role *
+                  </label>
+                  <div className="flex space-x-4">
+                    <Button
+                      type="button"
+                      variant={role === "STUDENT" ? "default" : "outline"}
+                      className="flex-1"
+                      onClick={() => setRole("STUDENT")}
+                    >
+                      Student
+                    </Button>
+                    <Button
+                      type="button"
+                      variant={role === "MENTOR" ? "default" : "outline"}
+                      className="flex-1"
+                      onClick={() => setRole("MENTOR")}
+                    >
+                      Mentor
+                    </Button>
                   </div>
                 </div>
               )}
