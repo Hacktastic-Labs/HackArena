@@ -19,8 +19,9 @@ import {
   ArrowRight,
   User,
   Megaphone,
+  LogOut,
 } from "lucide-react"
-import { useSession } from "@/app/lib/auth-client";
+import { useSession, signOut } from "@/app/lib/auth-client";
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
