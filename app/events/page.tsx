@@ -37,10 +37,10 @@ export default async function EventsPage() {
             <div className="flex items-center space-x-2">
               <Link href="/" className="flex items-center space-x-2">
                 <div className="w-8 h-8 bg-[#A63D00] rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-lg">S</span>
+                  <span className="text-white font-bold text-lg">H</span>
                 </div>
                 <span className="text-2xl font-bold text-[#A63D00]">
-                  Synora
+                  HackArena
                 </span>
               </Link>
             </div>
@@ -52,25 +52,31 @@ export default async function EventsPage() {
                 Dashboard
               </Link>
               <Link
-                href="/knowledge"
+                href="/problems"
                 className="text-gray-700 hover:text-[#A63D00] transition-colors"
               >
-                Knowledge Base
-              </Link>
-              <Link href="/events" className="text-[#A63D00] font-medium">
-                Events
-              </Link>
-              <Link
-                href="/blog"
-                className="text-gray-700 hover:text-[#A63D00] transition-colors"
-              >
-                Blog
+                My Problems
               </Link>
               <Link
                 href="/mentors"
                 className="text-gray-700 hover:text-[#A63D00] transition-colors"
               >
-                Find Mentors
+                Mentors
+              </Link>
+              <Link
+                href="/knowledge"
+                className="text-gray-700 hover:text-[#A63D00] transition-colors"
+              >
+                Knowledge
+              </Link>
+              <Link href="/events" className="text-[#A63D00] font-medium">
+                Events
+              </Link>
+              <Link
+                href="/updates"
+                className="text-gray-700 hover:text-[#A63D00] transition-colors"
+              >
+                Updates
               </Link>
             </div>
           </div>
