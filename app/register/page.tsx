@@ -2,14 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  ArrowLeft,
-  Eye,
-  EyeOff,
-  Mail,
-  Lock,
-  User,
-} from "lucide-react";
+import { ArrowLeft, Eye, EyeOff, Mail, Lock, User } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { signIn, signUp } from "@/app/lib/auth-client";
@@ -111,13 +104,22 @@ export default function RegisterPage() {
           email: formData.email,
           name: formData.username,
         });
-        const signupPayload: { email: string; password: string; name: string; role: string } = {
+        const signupPayload: {
+          email: string;
+          password: string;
+          name: string;
+          role: string;
+        } = {
           email: formData.email,
           password: formData.password,
           name: formData.username,
           role,
         };
-        const result = await (signUp.email as (payload: typeof signupPayload) => Promise<{ error?: { message: string } }>)(signupPayload);
+        const result = await (
+          signUp.email as (
+            payload: typeof signupPayload
+          ) => Promise<{ error?: { message: string } }>
+        )(signupPayload);
 
         console.log("Signup result:", result);
         if (result.error) {
@@ -197,12 +199,12 @@ export default function RegisterPage() {
           <div className="w-full max-w-md space-y-8">
             <div className="text-center">
               <h2 className="text-4xl font-bold text-gray-900 mb-2">
-                {isLogin ? "Welcome Back!" : "Join HackArena"}
+                {isLogin ? "Welcome Back!" : "Join Synora"}
               </h2>
               <p className="text-gray-600">
                 {isLogin
-                  ? "Sign in to continue your hacking journey"
-                  : "Start your competitive programming adventure"}
+                  ? "Sign in to continue your journey"
+                  : "Start your adventure with us"}
               </p>
             </div>
 
@@ -352,6 +354,7 @@ export default function RegisterPage() {
                       </button>
                     </div>
                   </div>
+
                 )}
 
                 {/* Role Selection */}
@@ -396,6 +399,7 @@ export default function RegisterPage() {
                 </Button>
               </form>
             </div>
+
 
             {/* Terms and Privacy */}
             {!isLogin && (

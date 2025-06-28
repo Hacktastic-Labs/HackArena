@@ -16,26 +16,31 @@ export default function MentorsPage() {
             <div className="flex items-center space-x-2">
               <Link href="/" className="flex items-center space-x-2">
                 <div className="w-8 h-8 bg-[#A63D00] rounded-lg flex items-center justify-center">
+
                   <img src="/sfinal.png" alt="Synora Logo" className="w-8 h-8 rounded-lg object-contain" />
+
                 </div>
-                <span className="text-2xl font-bold text-[#A63D00]">Synora</span>
+                <span className="text-2xl font-bold text-[#A63D00]">HackArena</span>
               </Link>
             </div>
             <div className="hidden md:flex items-center space-x-8">
               <Link href="/dashboard" className="text-gray-700 hover:text-[#A63D00] transition-colors">
                 Dashboard
               </Link>
+              <Link href="/problems" className="text-gray-700 hover:text-[#A63D00] transition-colors">
+                My Problems
+              </Link>
+              <Link href="/mentors" className="text-[#A63D00] font-medium">
+                Mentors
+              </Link>
               <Link href="/knowledge" className="text-gray-700 hover:text-[#A63D00] transition-colors">
-                Knowledge Base
+                Knowledge
               </Link>
               <Link href="/events" className="text-gray-700 hover:text-[#A63D00] transition-colors">
                 Events
               </Link>
-              <Link href="/blog" className="text-gray-700 hover:text-[#A63D00] transition-colors">
-                Blog
-              </Link>
-              <Link href="/mentors" className="text-[#A63D00] font-medium">
-                Find Mentors
+              <Link href="/updates" className="text-gray-700 hover:text-[#A63D00] transition-colors">
+                Updates
               </Link>
             </div>
           </div>

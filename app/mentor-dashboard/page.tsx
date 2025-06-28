@@ -18,8 +18,9 @@ import {
   Loader2,
   CheckCircle,
   Clock,
+  LogOut,
 } from "lucide-react";
-import { useSession } from "@/app/lib/auth-client";
+import { useSession, signOut } from "@/app/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useMentorProblems } from "@/app/lib/use-mentor-problems";
@@ -27,17 +28,29 @@ import { useMentorProblems } from "@/app/lib/use-mentor-problems";
 export default function MentorDashboardPage() {
   const { data: session, isPending } = useSession();
   const router = useRouter();
-  const { problems, stats, isLoading: problemsLoading, assignMentorToProblem } = useMentorProblems();
+  const {
+    problems,
+    stats,
+    isLoading: problemsLoading,
+    assignMentorToProblem,
+  } = useMentorProblems();
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case 'OPEN':
+      case "OPEN":
         return <Badge className="bg-blue-100 text-blue-800">Open</Badge>;
-      case 'IN_PROGRESS':
-        return <Badge className="bg-orange-100 text-orange-800">In Progress</Badge>;
-      case 'RESOLVED':
-        return <Badge className="bg-green-100 text-green-800"><CheckCircle className="h-3 w-3 mr-1" />Resolved</Badge>;
-      case 'CLOSED':
+      case "IN_PROGRESS":
+        return (
+          <Badge className="bg-orange-100 text-orange-800">In Progress</Badge>
+        );
+      case "RESOLVED":
+        return (
+          <Badge className="bg-green-100 text-green-800">
+            <CheckCircle className="h-3 w-3 mr-1" />
+            Resolved
+          </Badge>
+        );
+      case "CLOSED":
         return <Badge className="bg-gray-100 text-gray-800">Closed</Badge>;
       default:
         return <Badge className="bg-gray-100 text-gray-800">{status}</Badge>;
@@ -47,16 +60,18 @@ export default function MentorDashboardPage() {
   const getTimeAgo = (dateString: string) => {
     const date = new Date(dateString);
     const now = new Date();
-    const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
-    
+    const diffInMinutes = Math.floor(
+      (now.getTime() - date.getTime()) / (1000 * 60)
+    );
+
     if (diffInMinutes < 60) {
       return `${diffInMinutes} mins ago`;
     } else if (diffInMinutes < 1440) {
       const hours = Math.floor(diffInMinutes / 60);
-      return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+      return `${hours} hour${hours > 1 ? "s" : ""} ago`;
     } else {
       const days = Math.floor(diffInMinutes / 1440);
-      return `${days} day${days > 1 ? 's' : ''} ago`;
+      return `${days} day${days > 1 ? "s" : ""} ago`;
     }
   };
 
@@ -64,14 +79,17 @@ export default function MentorDashboardPage() {
     try {
       await assignMentorToProblem(problemId);
     } catch (error) {
-      console.error('Error assigning problem:', error);
+      console.error("Error assigning problem:", error);
     }
   };
 
   useEffect(() => {
     if (!isPending && !session) {
       router.push("/register");
-    } else if (!isPending && (session?.user as { role?: string })?.role !== "MENTOR") {
+    } else if (
+      !isPending &&
+      (session?.user as { role?: string })?.role !== "MENTOR"
+    ) {
       router.push("/dashboard");
     }
   }, [session, isPending, router]);
@@ -101,6 +119,7 @@ export default function MentorDashboardPage() {
               <img
                 src="/sfinal.png"
                 alt="Synora Logo"
+
                 className="w-12 h-12 rounded-md shadow object-contain p-0"
               />
               <div className="flex flex-col justify-center">
@@ -111,6 +130,7 @@ export default function MentorDashboardPage() {
                   by Hacktastic
                 </span>
               </div>
+
             </div>
             <div className="flex items-center space-x-4">
               <Button variant="ghost" size="sm" className="group relative">
@@ -123,6 +143,17 @@ export default function MentorDashboardPage() {
                   {session.user?.name?.charAt(0)?.toUpperCase() || "M"}
                 </AvatarFallback>
               </Avatar>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={async () => {
+                  await signOut();
+                  router.push("/register");
+                }}
+                className="group relative"
+              >
+                <LogOut className="h-4 w-4 group-hover:fill-[#A63D00] group-hover:text-[#A63D00] transition-all duration-300 group-hover:animate-pulse" />
+              </Button>
             </div>
           </div>
         </div>
@@ -134,19 +165,27 @@ export default function MentorDashboardPage() {
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
             Welcome back, {session.user?.name || "Mentor"}!
           </h1>
-          <p className="text-gray-600">Here&apos;s an overview of your mentoring activities.</p>
+          <p className="text-gray-600">
+            Here&apos;s an overview of your mentoring activities.
+          </p>
         </div>
 
         {/* Quick Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <Card className="border-[#A63D00]/20 hover:scale-105 transition-transform duration-300 cursor-pointer">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Active Students</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Active Students
+              </CardTitle>
               <Users className="h-4 w-4 text-[#A63D00]" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-[#A63D00]">
-                {problemsLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : stats.uniqueStudents}
+                {problemsLoading ? (
+                  <Loader2 className="h-6 w-6 animate-spin" />
+                ) : (
+                  stats.uniqueStudents
+                )}
               </div>
               <p className="text-xs text-gray-600">Students with problems</p>
             </CardContent>
@@ -154,12 +193,18 @@ export default function MentorDashboardPage() {
 
           <Card className="border-[#A63D00]/20 hover:scale-105 transition-transform duration-300 cursor-pointer">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Open Problems</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Open Problems
+              </CardTitle>
               <MessageSquare className="h-4 w-4 text-[#A63D00]" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-[#A63D00]">
-                {problemsLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : stats.openProblems}
+                {problemsLoading ? (
+                  <Loader2 className="h-6 w-6 animate-spin" />
+                ) : (
+                  stats.openProblems
+                )}
               </div>
               <p className="text-xs text-gray-600">Awaiting mentors</p>
             </CardContent>
@@ -167,12 +212,18 @@ export default function MentorDashboardPage() {
 
           <Card className="border-[#A63D00]/20 hover:scale-105 transition-transform duration-300 cursor-pointer">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">My Mentoring</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                My Mentoring
+              </CardTitle>
               <Calendar className="h-4 w-4 text-[#A63D00]" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-[#A63D00]">
-                {problemsLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : stats.myMentoredProblems}
+                {problemsLoading ? (
+                  <Loader2 className="h-6 w-6 animate-spin" />
+                ) : (
+                  stats.myMentoredProblems
+                )}
               </div>
               <p className="text-xs text-gray-600">Problems I'm helping with</p>
             </CardContent>
@@ -180,12 +231,18 @@ export default function MentorDashboardPage() {
 
           <Card className="border-[#A63D00]/20 hover:scale-105 transition-transform duration-300 cursor-pointer">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Resolved Problems</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Resolved Problems
+              </CardTitle>
               <Star className="h-4 w-4 text-[#A63D00]" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-[#A63D00]">
-                {problemsLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : stats.resolvedProblems}
+                {problemsLoading ? (
+                  <Loader2 className="h-6 w-6 animate-spin" />
+                ) : (
+                  stats.resolvedProblems
+                )}
               </div>
               <p className="text-xs text-gray-600">Successfully solved</p>
             </CardContent>
@@ -199,7 +256,9 @@ export default function MentorDashboardPage() {
             <Card className="border-[#A63D00]/20">
               <CardHeader>
                 <div className="flex justify-between items-center">
-                  <CardTitle className="text-xl">Recent Student Queries</CardTitle>
+                  <CardTitle className="text-xl">
+                    Recent Student Queries
+                  </CardTitle>
                   <Button className="bg-[#A63D00] hover:bg-[#A63D00]/90">
                     <Plus className="h-4 w-4 mr-2" />
                     View All Problems ({problems.length})
@@ -210,36 +269,51 @@ export default function MentorDashboardPage() {
                 {problemsLoading ? (
                   <div className="flex items-center justify-center py-8">
                     <Loader2 className="h-8 w-8 animate-spin text-[#A63D00]" />
-                    <span className="ml-2 text-gray-600">Loading problems...</span>
+                    <span className="ml-2 text-gray-600">
+                      Loading problems...
+                    </span>
                   </div>
                 ) : problems.length === 0 ? (
                   <div className="text-center py-8">
                     <MessageSquare className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">No student problems yet</h3>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                      No student problems yet
+                    </h3>
                     <p className="text-gray-600">
-                      When students post problems, they'll appear here for you to help with.
+                      When students post problems, they'll appear here for you
+                      to help with.
                     </p>
                   </div>
                 ) : (
                   problems.slice(0, 5).map((problem) => (
-                    <div key={problem.id} className={`border-l-4 pl-4 ${
-                      problem.status === 'OPEN' ? 'border-blue-500' :
-                      problem.status === 'IN_PROGRESS' ? 'border-orange-500' :
-                      problem.status === 'RESOLVED' ? 'border-green-500' :
-                      'border-gray-500'
-                    }`}>
+                    <div
+                      key={problem.id}
+                      className={`border-l-4 pl-4 ${
+                        problem.status === "OPEN"
+                          ? "border-blue-500"
+                          : problem.status === "IN_PROGRESS"
+                          ? "border-orange-500"
+                          : problem.status === "RESOLVED"
+                          ? "border-green-500"
+                          : "border-gray-500"
+                      }`}
+                    >
                       <div className="flex justify-between items-start mb-2">
                         <div className="flex-1">
                           <h4 className="font-semibold">{problem.title}</h4>
                           <p className="text-sm text-gray-600">
-                            {problem.description.length > 80 
-                              ? `${problem.description.substring(0, 80)}...` 
+                            {problem.description.length > 80
+                              ? `${problem.description.substring(0, 80)}...`
                               : problem.description}
                           </p>
                           {problem.tags.length > 0 && (
                             <div className="flex space-x-1 mt-2">
                               {problem.tags.slice(0, 3).map((tag, index) => (
-                                <Badge key={index} variant="secondary" className="text-xs">
+                                <Badge
+                                  key={index}
+                                  variant="secondary"
+                                  className="text-xs"
+                                >
                                   {tag}
                                 </Badge>
                               ))}
@@ -252,19 +326,28 @@ export default function MentorDashboardPage() {
                         <div className="flex items-center space-x-4 text-sm text-gray-500">
                           <div className="flex items-center space-x-2">
                             <Avatar className="h-5 w-5">
-                              <AvatarImage src={problem.user.image || "/placeholder.svg?height=20&width=20"} />
+                              <AvatarImage
+                                src={
+                                  problem.user.image ||
+                                  "/placeholder.svg?height=20&width=20"
+                                }
+                              />
                               <AvatarFallback className="bg-[#A63D00] text-white text-xs">
-                                {problem.user.name?.charAt(0)?.toUpperCase() || 'S'}
+                                {problem.user.name?.charAt(0)?.toUpperCase() ||
+                                  "S"}
                               </AvatarFallback>
                             </Avatar>
-                            <span>{problem.user.name || 'Student'}</span>
+                            <span>{problem.user.name || "Student"}</span>
                           </div>
                           <span>{getTimeAgo(problem.createdAt)}</span>
                         </div>
                         <div className="flex space-x-2">
                           {problem.mentor ? (
                             problem.mentor.name === session?.user?.name ? (
-                              <Button size="sm" className="bg-[#A63D00] hover:bg-[#A63D00]/90">
+                              <Button
+                                size="sm"
+                                className="bg-[#A63D00] hover:bg-[#A63D00]/90"
+                              >
                                 <MessageSquare className="h-3 w-3 mr-1" />
                                 Continue
                               </Button>
@@ -274,8 +357,8 @@ export default function MentorDashboardPage() {
                               </Button>
                             )
                           ) : (
-                            <Button 
-                              size="sm" 
+                            <Button
+                              size="sm"
                               className="bg-[#A63D00] hover:bg-[#A63D00]/90"
                               onClick={() => handleAssignToMe(problem.id)}
                             >
@@ -303,20 +386,35 @@ export default function MentorDashboardPage() {
                 <div className="flex justify-between items-center">
                   <span className="text-sm">Total Problems</span>
                   <span className="text-sm font-bold text-[#A63D00]">
-                    {problemsLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : stats.totalProblems}
+                    {problemsLoading ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      stats.totalProblems
+                    )}
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-sm">Resolution Rate</span>
                   <span className="text-sm font-bold text-[#A63D00]">
-                    {problemsLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : 
-                     stats.totalProblems > 0 ? `${Math.round((stats.resolvedProblems / stats.totalProblems) * 100)}%` : '0%'}
+                    {problemsLoading ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : stats.totalProblems > 0 ? (
+                      `${Math.round(
+                        (stats.resolvedProblems / stats.totalProblems) * 100
+                      )}%`
+                    ) : (
+                      "0%"
+                    )}
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-sm">In Progress</span>
                   <span className="text-sm font-bold text-[#A63D00]">
-                    {problemsLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : stats.inProgressProblems}
+                    {problemsLoading ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      stats.inProgressProblems
+                    )}
                   </span>
                 </div>
                 <Button className="w-full bg-[#A63D00] hover:bg-[#A63D00]/90">
