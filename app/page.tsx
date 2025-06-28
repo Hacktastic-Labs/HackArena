@@ -1,41 +1,42 @@
 import { Button } from "@/components/ui/button"
-import { ArrowRight, Copy, Github, Users, BookOpen, MessageSquare, TrendingUp, Star, Calendar, LayoutDashboard, Sparkles } from "lucide-react"
+import { ArrowRight, Copy, Github, Users, BookOpen, MessageSquare, TrendingUp, Star, Calendar, LayoutDashboard, Sparkles, Globe } from "lucide-react"
 import Link from "next/link"
 
 export default function HomePage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Navigation */}
-      <nav className="border-b border-gray-200 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-3">
-              <div className="w-12 h-12 bg-[#FFB74D] rounded-md flex items-center justify-center shadow">
-                <Sparkles className="text-[#A63D00] w-7 h-7" />
+      <div className="max-w-7xl mx-auto py-2 px-4">
+        <nav className="border-b border-gray-200 bg-white">
+          <div>
+            <div className="flex justify-between items-center h-16">
+              <div className="flex items-center space-x-3">
+                <img src="/sfinal.png" alt="Synora Logo" className="w-12 h-12 rounded-md shadow object-contain p-0" />
+                <div className="flex flex-col justify-center">
+                  <span className="text-2xl font-bold text-gray-900 font-inter leading-tight">Synora</span>
+                  <span className="text-base text-gray-400 leading-tight">by Hacktastic</span>
+                </div>
               </div>
-              <span className="text-2xl font-bold text-gray-900">SYNORA</span>
-              <span className="mx-2 text-xl text-gray-300 font-light">//</span>
-              <span className="text-base text-gray-400">by Hacktastic</span>
-            </div>
-            <div className="flex items-center space-x-4">
-              <Button
-                className="bg-[#FFB74D] text-[#A63D00] font-bold border-2 border-[#A63D00] shadow-[6px_6px_0px_0px_#000000] hover:bg-[#FFF8E1] hover:shadow-[3px_3px_0px_0px_#000000] hover:translate-x-1 hover:translate-y-1 transition-all duration-150 px-6 py-2 text-base flex items-center"
-              >
-                <LayoutDashboard className="h-4 w-4 mr-2" />
-                <Link href="/dashboard" className="flex items-center">
-                  Go to Dashboard
-                </Link>
-              </Button>
-              <Button
-                className="bg-[#FFB74D] text-[#A63D00] font-bold border-2 border-[#A63D00] shadow-[6px_6px_0px_0px_#000000] hover:bg-[#FFF8E1] hover:shadow-[3px_3px_0px_0px_#000000] hover:translate-x-1 hover:translate-y-1 transition-all duration-150 px-6 py-2 text-base flex items-center"
-              >
-                <Github className="h-4 w-4 mr-2" />
-                GitHub
-              </Button>
+              <div className="flex items-center space-x-4 -mt-1">
+                <Button
+                  className="bg-[#FFB74D] text-[#A63D00] font-bold border-2 border-[#A63D00] shadow-[6px_6px_0px_0px_#000000] hover:bg-[#FFF8E1] hover:shadow-[3px_3px_0px_0px_#000000] hover:translate-x-1 hover:translate-y-1 transition-all duration-150 px-6 py-2 text-base flex items-center"
+                >
+                  <LayoutDashboard className="h-4 w-4 mr-2" />
+                  <Link href="/dashboard" className="flex items-center">
+                    Go to Dashboard
+                  </Link>
+                </Button>
+                <Button
+                  className="bg-[#FFB74D] text-[#A63D00] font-bold border-2 border-[#A63D00] shadow-[6px_6px_0px_0px_#000000] hover:bg-[#FFF8E1] hover:shadow-[3px_3px_0px_0px_#000000] hover:translate-x-1 hover:translate-y-1 transition-all duration-150 px-6 py-2 text-base flex items-center"
+                >
+                  <Github className="h-4 w-4 mr-2" />
+                  GitHub
+                </Button>
+              </div>
             </div>
           </div>
-        </div>
-      </nav>
+        </nav>
+      </div>
 
       {/* Hero Section */}
       <div className="w-11/12 max-w-screen-2xl mx-auto">
@@ -76,7 +77,7 @@ export default function HomePage() {
                   {/* Main cube stack */}
                   <div className="relative">
                     {/* Top cube - Knowledge */}
-                    <div className="w-32 h-32 bg-[#FFE8CC] border-2 border-[#A63D00]/20 rounded-lg transform rotate-12 shadow-lg relative">
+                    <div className="w-32 h-32 bg-[#FFE8CC] border-2 border-[#A63D00]/20 rounded-lg transform rotate-12 shadow-lg relative float-animate">
                       <div className="absolute inset-0 flex items-center justify-center">
                         <BookOpen className="h-12 w-12 text-[#A63D00]" />
                       </div>
@@ -86,7 +87,7 @@ export default function HomePage() {
                     </div>
 
                     {/* Middle cube - Mentorship */}
-                    <div className="w-36 h-36 bg-[#A63D00] border-2 border-gray-200 rounded-lg transform -rotate-6 shadow-xl relative -mt-16 ml-8">
+                    <div className="w-36 h-36 bg-[#A63D00] border-2 border-gray-200 rounded-lg transform -rotate-6 shadow-xl relative -mt-16 ml-8 float-animate-reverse">
                       <div className="absolute inset-0 flex items-center justify-center">
                         <Users className="h-14 w-14 text-white" />
                       </div>
@@ -96,7 +97,7 @@ export default function HomePage() {
                     </div>
 
                     {/* Bottom cube - Growth */}
-                    <div className="w-40 h-40 bg-gradient-to-br from-[#FFE8CC] to-[#A63D00]/20 border-2 border-[#A63D00]/30 rounded-lg transform rotate-3 shadow-2xl relative -mt-20 -ml-4">
+                    <div className="w-40 h-40 bg-gradient-to-br from-[#FFE8CC] to-[#A63D00]/20 border-2 border-[#A63D00]/30 rounded-lg transform rotate-3 shadow-2xl relative -mt-20 -ml-4 float-animate">
                       <div className="absolute inset-0 flex items-center justify-center">
                         <TrendingUp className="h-16 w-16 text-[#A63D00]" />
                       </div>
@@ -107,16 +108,49 @@ export default function HomePage() {
                   </div>
 
                   {/* Floating elements */}
-                  <div className="absolute -top-8 -left-8 w-16 h-16 bg-white border-2 border-dashed border-[#A63D00]/30 rounded-lg flex items-center justify-center shadow-lg">
+                  <div className="absolute -top-8 -left-8 w-16 h-16 bg-white border-2 border-dashed border-[#A63D00]/30 rounded-lg flex items-center justify-center shadow-lg float-animate-reverse">
                     <MessageSquare className="h-6 w-6 text-[#A63D00]" />
                   </div>
 
-                  <div className="absolute -bottom-4 -right-8 w-12 h-12 bg-[#A63D00] rounded-full flex items-center justify-center shadow-lg">
+                  <div className="absolute -bottom-4 -right-8 w-12 h-12 bg-[#A63D00] rounded-full flex items-center justify-center shadow-lg float-animate">
                     <Star className="h-6 w-6 text-white" />
                   </div>
 
-                  <div className="absolute top-1/2 -right-12 w-14 h-14 bg-[#FFE8CC] border-2 border-[#A63D00]/20 rounded-lg flex items-center justify-center shadow-lg">
+                  <div className="absolute top-1/2 -right-12 w-14 h-14 bg-[#FFE8CC] border-2 border-[#A63D00]/20 rounded-lg flex items-center justify-center shadow-lg float-animate-reverse">
                     <Calendar className="h-6 w-6 text-[#A63D00]" />
+                  </div>
+
+                  {/* Additional floating elements */}
+                  <div className="absolute top-0 left-1/2 w-10 h-10 bg-[#FFB74D] rounded-full flex items-center justify-center shadow-lg float-animate">
+                    <Sparkles className="h-6 w-6 text-[#A63D00]" />
+                  </div>
+                  <div className="absolute bottom-8 right-1/4 w-8 h-8 bg-white border-2 border-dashed border-[#A63D00]/30 rounded-lg flex items-center justify-center shadow-lg float-animate-reverse">
+                    <BookOpen className="h-5 w-5 text-[#A63D00]" />
+                  </div>
+                  <div className="absolute top-1/4 right-8 w-9 h-9 bg-[#A63D00]/10 rounded-full flex items-center justify-center shadow-lg float-animate">
+                    <Star className="h-5 w-5 text-[#A63D00]" />
+                  </div>
+
+                  {/* Large floating element - left */}
+                  <div className="absolute top-1/3 -left-28 w-20 h-20 bg-[#FFB74D] rounded-2xl flex items-center justify-center shadow-xl float-animate">
+                    <BookOpen className="h-10 w-10 text-[#A63D00]" />
+                  </div>
+                  {/* Large floating element - right */}
+                  <div className="absolute bottom-2 -right-32 w-24 h-24 bg-[#A63D00]/20 rounded-2xl flex items-center justify-center shadow-xl float-animate-reverse">
+                    <Users className="h-12 w-12 text-[#A63D00]" />
+                  </div>
+
+                  {/* Large floating element - far left */}
+                  <div className="absolute top-2 -left-40 w-20 h-20 bg-[#A63D00]/10 rounded-full flex items-center justify-center shadow-xl float-animate-reverse">
+                    <Globe className="h-10 w-10 text-[#A63D00]" />
+                  </div>
+                  {/* Large floating element - far right */}
+                  <div className="absolute top-4 -right-44 w-24 h-24 bg-[#FFB74D]/80 rounded-2xl flex items-center justify-center shadow-xl float-animate">
+                    <Calendar className="h-12 w-12 text-[#A63D00]" />
+                  </div>
+                  {/* Medium floating element - bottom left */}
+                  <div className="absolute bottom-4 left-8 w-16 h-16 bg-white border-2 border-dashed border-[#A63D00]/30 rounded-lg flex items-center justify-center shadow-lg float-animate">
+                    <ArrowRight className="h-8 w-8 text-[#A63D00]" />
                   </div>
 
                   {/* Connecting lines */}
@@ -153,9 +187,8 @@ export default function HomePage() {
       </div>
 
       {/* Stats Section */}
-      
-      <section className="py-12 p4 sm:px-6 lg:px-8 bg-gray-50">
-        <div className="max-w-7xl mx-auto">
+      <section className="mt-8 py-12 p4 sm:px-6 lg:px-8 bg-gray-50">
+        <div className="max-w-screen-2xl w-full mx-auto">
           <div className="grid grid-cols-4 grid-rows-2 gap-4 h-80">
             {/* Large box - Active Students */}
             <div className="col-span-2 row-span-2 bg-gradient-to-br from-[#A63D00] to-[#8B3400] rounded-2xl p-8 text-white relative overflow-hidden">
@@ -206,25 +239,25 @@ export default function HomePage() {
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            <div className="group p-8 border-2 border-dashed border-gray-200 rounded-xl hover:border-[#A63D00] transition-colors">
+            <div className="group p-8 border-2 border-dashed border-gray-200 rounded-xl hover:border-[#A63D00] transition-colors hover:bg-[#FFE8CC]">
               <div className="w-12 h-12 bg-[#FFE8CC] rounded-lg flex items-center justify-center mb-6 group-hover:bg-[#A63D00] transition-colors">
-                <BookOpen className="h-6 w-6 text-[#A63D00] group-hover:text-white" />
+                <BookOpen className="h-6 w-6 text-[#A63D00] group-hover:text-white icon-bounce" />
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-3">Smart Knowledge Base</h3>
               <p className="text-gray-600">AI-powered search and categorization with semantic matching</p>
             </div>
 
-            <div className="group p-8 border-2 border-dashed border-gray-200 rounded-xl hover:border-[#A63D00] transition-colors">
+            <div className="group p-8 border-2 border-dashed border-gray-200 rounded-xl hover:border-[#A63D00] transition-colors hover:bg-[#FFE8CC]">
               <div className="w-12 h-12 bg-[#FFE8CC] rounded-lg flex items-center justify-center mb-6 group-hover:bg-[#A63D00] transition-colors">
-                <Users className="h-6 w-6 text-[#A63D00] group-hover:text-white" />
+                <Users className="h-6 w-6 text-[#A63D00] group-hover:text-white icon-bounce" />
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-3">AI Mentor Matching</h3>
               <p className="text-gray-600">Intelligent suggestions based on expertise and compatibility</p>
             </div>
 
-            <div className="group p-8 border-2 border-dashed border-gray-200 rounded-xl hover:border-[#A63D00] transition-colors">
+            <div className="group p-8 border-2 border-dashed border-gray-200 rounded-xl hover:border-[#A63D00] transition-colors hover:bg-[#FFE8CC]">
               <div className="w-12 h-12 bg-[#FFE8CC] rounded-lg flex items-center justify-center mb-6 group-hover:bg-[#A63D00] transition-colors">
-                <MessageSquare className="h-6 w-6 text-[#A63D00] group-hover:text-white" />
+                <MessageSquare className="h-6 w-6 text-[#A63D00] group-hover:text-white icon-bounce" />
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-3">Real-time Communication</h3>
               <p className="text-gray-600">Seamless chat and video integration for instant help</p>
@@ -233,19 +266,24 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Wavy divider */}
+      <div className="w-full overflow-hidden leading-none">
+       
+      </div>
+
       {/* CTA Section */}
-      <section className="py-12 px-4 sm:px-6 lg:px-8 bg-[#A63D00]">
+      <section className="py-12 px-4 sm:px-6 lg:px-8 bg-[#B34700]">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-4xl font-bold text-white mb-6">Ready to transform your learning?</h2>
           <p className="text-xl text-[#FFE8CC] mb-8">Join thousands of students and mentors already using Synora</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="bg-white text-[#A63D00] hover:bg-[#FFE8CC] px-8 py-4 text-lg">
+            <Button size="lg" className="bg-white text-[#A63D00] hover:bg-transparent hover:text-white hover:border-white border-2 border-white px-8 py-4 text-lg font-bold transition-all duration-200 transform hover:scale-105 hover:shadow-[0_6px_0_0_#000]">
               <Link href="/register">Start Learning Today</Link>
             </Button>
             <Button
               size="lg"
               variant="outline"
-              className="border-2 border-white text-white hover:bg-white hover:text-[#A63D00] bg-transparent px-8 py-4 text-lg"
+              className="border-2 border-white text-white hover:bg-white hover:text-[#A63D00] bg-transparent px-8 py-4 text-lg font-bold transition-all duration-200 transform hover:scale-105 hover:shadow-[0_6px_0_0_#000]"
             >
               <Link href="/mentors">Become a Mentor</Link>
             </Button>

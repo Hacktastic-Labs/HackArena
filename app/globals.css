@@ -162,3 +162,37 @@
   right: -6px;
   bottom: -6px;
 }
+
+@keyframes float {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+  100% { transform: translateY(0); }
+}
+
+.float-animate {
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float-reverse {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(12px); }
+  100% { transform: translateY(0); }
+}
+
+.float-animate-reverse {
+  animation: float-reverse 3s ease-in-out infinite;
+}
+
+@keyframes icon-bounce {
+  0%, 100% { transform: translateY(0); }
+  30% { transform: translateY(-8px) scale(1.1); }
+  50% { transform: translateY(2px) scale(0.95); }
+  70% { transform: translateY(-4px) scale(1.05); }
+}
+
+.icon-bounce {
+  transition: transform 0.2s;
+}
+.group:hover .icon-bounce {
+  animation: icon-bounce 1s ease-in-out 1;
+}
