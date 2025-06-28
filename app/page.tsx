@@ -31,8 +31,10 @@ export default function HomePage() {
                 variant="outline"
                 className="border-2 border-dashed border-gray-300 text-gray-700 hover:border-[#A63D00] hover:text-[#A63D00] bg-transparent"
               >
-                <Github className="h-4 w-4 mr-2" />
-                GitHub
+                <Link href="https://github.com/hacktastic-Labs/hackArena/" className="flex items-center" target="_blank" rel="noopener noreferrer">
+                  <Github className="h-4 w-4 mr-2" />
+                  GitHub
+                </Link>
               </Button>
             </div>
           </div>
@@ -246,7 +248,7 @@ export default function HomePage() {
               variant="outline"
               className="border-2 border-white text-white hover:bg-white hover:text-[#A63D00] bg-transparent px-8 py-4 text-lg"
             >
-              <Link href="/mentors">Become a Mentor</Link>
+              <Link href="/become-mentor">Become a Mentor</Link>
             </Button>
           </div>
         </div>
