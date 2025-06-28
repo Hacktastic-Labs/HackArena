@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { ArrowLeft, Eye, EyeOff, Mail, Lock, User, Phone, Calendar } from "lucide-react"
+import { ArrowLeft, Eye, EyeOff, Mail, Lock, User, Phone, Calendar, GraduationCap, Users, Github, Linkedin } from "lucide-react"
 import Link from "next/link"
 import { useState } from "react"
 
@@ -10,6 +10,7 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [isLogin, setIsLogin] = useState(false)
+  const [userType, setUserType] = useState<'student' | 'mentor'>('student')
 
   return (
     <div className="min-h-screen bg-white">
@@ -87,14 +88,27 @@ export default function RegisterPage() {
             <form className="space-y-6">
               {!isLogin && (
                 <>
-                  {/* Full Name */}
+                  {/* First Name */}
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-700">Full Name</label>
+                    <label className="text-sm font-medium text-gray-700">First Name</label>
                     <div className="relative">
                       <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                       <Input
                         type="text"
-                        placeholder="Enter your full name"
+                        placeholder="Enter your first name"
+                        className="pl-10 border-2 border-gray-200 focus:border-[#A63D00] focus:ring-[#A63D00]/20"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Last Name */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-700">Last Name</label>
+                    <div className="relative">
+                      <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                      <Input
+                        type="text"
+                        placeholder="Enter your last name"
                         className="pl-10 border-2 border-gray-200 focus:border-[#A63D00] focus:ring-[#A63D00]/20"
                       />
                     </div>
@@ -120,6 +134,63 @@ export default function RegisterPage() {
                       <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                       <Input
                         type="date"
+                        className="pl-10 border-2 border-gray-200 focus:border-[#A63D00] focus:ring-[#A63D00]/20"
+                      />
+                    </div>
+                  </div>
+
+                  {/* User Type Selection */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-700">I am a...</label>
+                    <div className="grid grid-cols-2 gap-3">
+                      <button
+                        type="button"
+                        onClick={() => setUserType('student')}
+                        className={`flex items-center justify-center space-x-2 p-4 rounded-lg border-2 transition-all ${
+                          userType === 'student'
+                            ? 'border-[#A63D00] bg-[#A63D00]/10 text-[#A63D00]'
+                            : 'border-gray-200 hover:border-[#A63D00]/50 text-gray-600 hover:text-[#A63D00]'
+                        }`}
+                      >
+                        <GraduationCap className="h-5 w-5" />
+                        <span className="font-medium">Student</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setUserType('mentor')}
+                        className={`flex items-center justify-center space-x-2 p-4 rounded-lg border-2 transition-all ${
+                          userType === 'mentor'
+                            ? 'border-[#A63D00] bg-[#A63D00]/10 text-[#A63D00]'
+                            : 'border-gray-200 hover:border-[#A63D00]/50 text-gray-600 hover:text-[#A63D00]'
+                        }`}
+                      >
+                        <Users className="h-5 w-5" />
+                        <span className="font-medium">Mentor</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* GitHub URL */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-700">GitHub URL (Optional)</label>
+                    <div className="relative">
+                      <Github className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                      <Input
+                        type="url"
+                        placeholder="https://github.com/yourusername"
+                        className="pl-10 border-2 border-gray-200 focus:border-[#A63D00] focus:ring-[#A63D00]/20"
+                      />
+                    </div>
+                  </div>
+
+                  {/* LinkedIn URL */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-700">LinkedIn URL (Optional)</label>
+                    <div className="relative">
+                      <Linkedin className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                      <Input
+                        type="url"
+                        placeholder="https://linkedin.com/in/yourprofile"
                         className="pl-10 border-2 border-gray-200 focus:border-[#A63D00] focus:ring-[#A63D00]/20"
                       />
                     </div>
@@ -202,7 +273,7 @@ export default function RegisterPage() {
             </div>
 
             {/* Social Login */}
-            <div className="grid grid-cols-2 gap-3">
+            <div className="flex justify-center">
               <Button
                 variant="outline"
                 className="border-2 border-gray-200 hover:border-[#A63D00] hover:text-[#A63D00] bg-white"
@@ -213,16 +284,7 @@ export default function RegisterPage() {
                   <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
                   <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
                 </svg>
-                Google
-              </Button>
-              <Button
-                variant="outline"
-                className="border-2 border-gray-200 hover:border-[#A63D00] hover:text-[#A63D00] bg-white"
-              >
-                <svg className="h-5 w-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/>
-                </svg>
-                Twitter
+                Continue with Google
               </Button>
             </div>
 
