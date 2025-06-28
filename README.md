@@ -1,6 +1,6 @@
-# 🚀 Hacktastic Platform
+# 🚀 Synora
 
-An intelligent community-driven platform to streamline hackathon participation, knowledge sharing, and student-mentor interaction — powered by smart AI features.
+An intelligent community-driven platform to streamline participation, knowledge sharing, and student-mentor interaction — powered by smart AI features.
 
 ## 👥 Team Hacktastic
 
