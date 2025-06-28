@@ -24,10 +24,14 @@ model User {
   image           String?
   createdAt       DateTime @default(now()) @map("created_at")
   updatedAt       DateTime @updatedAt @map("updated_at")
-  
+
   // Better Auth relationships
   sessions        Session[]
   accounts        Account[]
+  
+  // Event System relationships
+  organizedEvents Event[]        @relation("OrganizedEvents")
+  registrations   Registration[]
   
   @@map("users")
 }
@@ -74,4 +78,40 @@ model Verification {
   
   @@unique([identifier, value])
   @@map("verifications")
+}
+
+enum RegistrationStatus {
+  REGISTERED
+  CHECKED_IN
+  CANCELLED
+}
+
+model Event {
+  id            String    @id @default(cuid())
+  title         String
+  description   String?
+  date          DateTime
+  location      String
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  organizerId   String
+  organizer     User      @relation("OrganizedEvents", fields: [organizerId], references: [id])
+  registrations Registration[]
+
+  @@index([organizerId])
+}
+
+model Registration {
+  id        String             @id @default(cuid())
+  userId    String
+  user      User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  eventId   String
+  event     Event              @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  status    RegistrationStatus @default(REGISTERED)
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
+
+  @@unique([userId, eventId])
+  @@index([eventId])
+  @@index([userId])
 }
