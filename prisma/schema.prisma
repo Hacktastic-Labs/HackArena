@@ -16,44 +16,62 @@ datasource db {
 }
 
 model User {
-id              String   @id @default(cuid())
-email           String   @unique
-username        String   @unique
-firstName       String   @map("first_name")
-lastName        String   @map("last_name")
-passwordHash    String   @map("password_hash")
-githubUsername  String?  @map("github_username")
-linkedinUrl     String?  @map("linkedin_url")
-portfolioUrl    String?  @map("portfolio_url")
-
-role            UserRole @default(PARTICIPANT)
-createdAt       DateTime @default(now()) @map("created_at")
-updatedAt       DateTime @updatedAt @map("updated_at")
-
-// Relationships
-
-// kbArticles          KnowledgeBaseArticle[]
-// kbQuestions         KnowledgeBaseQuestion[]
-// kbAnswers           KnowledgeBaseAnswer[]
-// kbVotes             KnowledgeBaseVote[]
-// blogPosts           BlogPost[]
-// blogComments        BlogComment[]
-// announcements       Announcement[]
-// events              Event[]
-// eventRegistrations  EventRegistration[]
-// eventCheckIns       EventCheckIn[]
-// mentorProfile       MentorProfile?
-// studentProblems     StudentProblem[]
-// mentoringSessions   MentoringSession[] @relation("MentoringSessions")
-// studentSessions     MentoringSession[] @relation("StudentSessions")
-// chatMessages        ChatMessage[]
-// pastHackProjects    PastHackProject[]
-@@map("users")
+  id              String   @id @default(cuid())
+  email           String   @unique
+  emailVerified   Boolean  @default(false) @map("email_verified")
+  name            String?
+  username        String?  @unique
+  image           String?
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+  
+  // Better Auth relationships
+  sessions        Session[]
+  accounts        Account[]
+  
+  @@map("users")
 }
 
-enum UserRole {
-ADMIN
-ORGANIZER
-MENTOR
-PARTICIPANT
+model Session {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String   @map("user_id")
+  expiresAt DateTime @map("expires_at")
+  ipAddress String?  @map("ip_address")
+  userAgent String?  @map("user_agent")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("sessions")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String  @map("user_id")
+  accountId         String  @map("account_id")
+  providerId        String  @map("provider_id")
+  accessToken       String? @map("access_token")
+  refreshToken      String? @map("refresh_token")
+  idToken           String? @map("id_token")
+  expiresAt         DateTime? @map("expires_at")
+  password          String?
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt      @map("updated_at")
+  
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@unique([providerId, accountId])
+  @@map("accounts")
+}
+
+model Verification {
+  id         String   @id @default(cuid())
+  identifier String
+  value      String
+  expiresAt  DateTime @map("expires_at")
+  
+  @@unique([identifier, value])
+  @@map("verifications")
 }
