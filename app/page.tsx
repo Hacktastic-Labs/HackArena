@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button"
-import { ArrowRight, Copy, Github, Users, BookOpen, MessageSquare, TrendingUp, Star, Calendar } from "lucide-react"
+import { ArrowRight, Copy, Github, Users, BookOpen, MessageSquare, TrendingUp, Star, Calendar, LayoutDashboard, Sparkles } from "lucide-react"
 import Link from "next/link"
 
 export default function HomePage() {
@@ -10,26 +10,24 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-[#A63D00] rounded-xl flex items-center justify-center">
-                <span className="text-white font-bold text-xl">S</span>
+              <div className="w-12 h-12 bg-[#FFB74D] rounded-md flex items-center justify-center shadow">
+                <Sparkles className="text-[#A63D00] w-7 h-7" />
               </div>
-              <div>
-                <span className="text-2xl font-bold text-gray-900">Synora</span>
-                <span className="text-sm text-gray-500 ml-2">by Hacktastic</span>
-              </div>
+              <span className="text-2xl font-bold text-gray-900">SYNORA</span>
+              <span className="mx-2 text-xl text-gray-300 font-light">//</span>
+              <span className="text-base text-gray-400">by Hacktastic</span>
             </div>
             <div className="flex items-center space-x-4">
               <Button
-                variant="outline"
-                className="border-2 border-dashed border-gray-300 text-gray-700 hover:border-[#A63D00] hover:text-[#A63D00] bg-transparent"
+                className="bg-[#FFB74D] text-[#A63D00] font-bold border-2 border-[#A63D00] shadow-[6px_6px_0px_0px_#000000] hover:bg-[#FFF8E1] hover:shadow-[3px_3px_0px_0px_#000000] hover:translate-x-1 hover:translate-y-1 transition-all duration-150 px-6 py-2 text-base flex items-center"
               >
+                <LayoutDashboard className="h-4 w-4 mr-2" />
                 <Link href="/dashboard" className="flex items-center">
                   Go to Dashboard
                 </Link>
               </Button>
               <Button
-                variant="outline"
-                className="border-2 border-dashed border-gray-300 text-gray-700 hover:border-[#A63D00] hover:text-[#A63D00] bg-transparent"
+                className="bg-[#FFB74D] text-[#A63D00] font-bold border-2 border-[#A63D00] shadow-[6px_6px_0px_0px_#000000] hover:bg-[#FFF8E1] hover:shadow-[3px_3px_0px_0px_#000000] hover:translate-x-1 hover:translate-y-1 transition-all duration-150 px-6 py-2 text-base flex items-center"
               >
                 <Github className="h-4 w-4 mr-2" />
                 GitHub
