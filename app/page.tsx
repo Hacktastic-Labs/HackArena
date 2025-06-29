@@ -221,41 +221,35 @@ export default function HomePage() {
         <div className="max-w-screen-2xl w-full mx-auto">
           <div className="grid grid-cols-4 grid-rows-2 gap-4 h-80">
             {/* Large box - Active Students */}
-            <div className="stat-pop col-span-2 row-span-2 bg-gradient-to-br from-[#A63D00] to-[#8B3400] rounded-2xl p-8 text-white relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16"></div>
+            <div className="col-span-2 row-span-2 bg-gradient-to-br from-[#A63D00] to-[#8B3400] border-4 border-black rounded-md shadow-[4px_4px_0px_0px_#000] hover:shadow-[8px_8px_0px_0px_#000] transition-all duration-200 p-8 text-white relative cursor-pointer group">
               <div className="relative z-10">
                 <div className="text-5xl font-black mb-3">2,500+</div>
-                <div className="text-xl font-medium opacity-90">
-                  Active Students
-                </div>
-                <div className="text-sm opacity-75 mt-2">Growing every day</div>
+                <div className="text-xl font-extrabold opacity-90">Active Students</div>
+                <div className="text-sm opacity-75 mt-2 font-semibold">Growing every day</div>
               </div>
             </div>
 
             {/* Top right - Expert Mentors */}
-            <div className="stat-pop col-span-2 bg-gradient-to-br from-[#FFE8CC] to-[#F4D4A7] rounded-2xl p-6 text-[#A63D00] relative overflow-hidden">
-              <div className="absolute bottom-0 left-0 w-24 h-24 bg-[#A63D00]/10 rounded-full translate-y-12 -translate-x-12"></div>
+            <div className="col-span-2 bg-gradient-to-br from-[#FFE8CC] to-[#F4D4A7] border-4 border-black rounded-md shadow-[4px_4px_0px_0px_#000] hover:shadow-[8px_8px_0px_0px_#000] transition-all duration-200 p-6 text-[#A63D00] relative cursor-pointer group">
               <div className="relative z-10">
                 <div className="text-4xl font-black mb-2">850+</div>
-                <div className="text-lg font-medium">Expert Mentors</div>
+                <div className="text-lg font-extrabold">Expert Mentors</div>
               </div>
             </div>
 
             {/* Bottom left - Problems Solved */}
-            <div className="stat-pop bg-gradient-to-br from-[#FF6B35] to-[#E55A2B] rounded-2xl p-6 text-white relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-20 h-20 bg-white/20 rounded-full -translate-y-10 translate-x-10"></div>
+            <div className="bg-gradient-to-br from-[#FF6B35] to-[#E55A2B] border-4 border-black rounded-md shadow-[4px_4px_0px_0px_#000] hover:shadow-[8px_8px_0px_0px_#000] transition-all duration-200 p-6 text-white relative cursor-pointer group">
               <div className="relative z-10">
                 <div className="text-3xl font-black mb-2">15K+</div>
-                <div className="text-sm font-medium">Problems Solved</div>
+                <div className="text-sm font-extrabold">Problems Solved</div>
               </div>
             </div>
 
             {/* Bottom right - Success Rate */}
-            <div className="stat-pop bg-gradient-to-br from-[#FFB74D] to-[#FF9800] rounded-2xl p-6 text-white relative overflow-hidden">
-              <div className="absolute bottom-0 left-0 w-16 h-16 bg-white/20 rounded-full translate-y-8 -translate-x-8"></div>
+            <div className="bg-gradient-to-br from-[#FFB74D] to-[#FF9800] border-4 border-black rounded-md shadow-[4px_4px_0px_0px_#000] hover:shadow-[8px_8px_0px_0px_#000] transition-all duration-200 p-6 text-white relative cursor-pointer group">
               <div className="relative z-10">
                 <div className="text-3xl font-black mb-2">98%</div>
-                <div className="text-sm font-medium">Success Rate</div>
+                <div className="text-sm font-extrabold">Success Rate</div>
               </div>
             </div>
           </div>
@@ -275,7 +269,7 @@ export default function HomePage() {
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            <div className="group p-8 border-2 border-dashed border-gray-200 rounded-xl hover:border-[#A63D00] transition-colors hover:bg-[#FFE8CC]">
+            <div className="group p-8 border-4 border-dashed border-black rounded-md hover:border-[#A63D00] transition-colors hover:bg-[#FFE8CC]">
               <div className="w-12 h-12 bg-[#FFE8CC] rounded-lg flex items-center justify-center mb-6 group-hover:bg-[#A63D00] transition-colors">
                 <BookOpen className="h-6 w-6 text-[#A63D00] group-hover:text-white icon-bounce" />
               </div>
@@ -287,7 +281,7 @@ export default function HomePage() {
               </p>
             </div>
 
-            <div className="group p-8 border-2 border-dashed border-gray-200 rounded-xl hover:border-[#A63D00] transition-colors hover:bg-[#FFE8CC]">
+            <div className="group p-8 border-4 border-dashed border-black rounded-md hover:border-[#A63D00] transition-colors hover:bg-[#FFE8CC]">
               <div className="w-12 h-12 bg-[#FFE8CC] rounded-lg flex items-center justify-center mb-6 group-hover:bg-[#A63D00] transition-colors">
                 <Users className="h-6 w-6 text-[#A63D00] group-hover:text-white icon-bounce" />
               </div>
@@ -299,7 +293,7 @@ export default function HomePage() {
               </p>
             </div>
 
-            <div className="group p-8 border-2 border-dashed border-gray-200 rounded-xl hover:border-[#A63D00] transition-colors hover:bg-[#FFE8CC]">
+            <div className="group p-8 border-4 border-dashed border-black rounded-md hover:border-[#A63D00] transition-colors hover:bg-[#FFE8CC]">
               <div className="w-12 h-12 bg-[#FFE8CC] rounded-lg flex items-center justify-center mb-6 group-hover:bg-[#A63D00] transition-colors">
                 <MessageSquare className="h-6 w-6 text-[#A63D00] group-hover:text-white icon-bounce" />
               </div>

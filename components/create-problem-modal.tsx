@@ -68,7 +68,7 @@ export function CreateProblemModal({ isOpen, onClose, onSubmit }: CreateProblemM
         <CardHeader>
           <div className="flex justify-between items-center">
             <div>
-              <CardTitle className="text-2xl">Post New Problem</CardTitle>
+              <CardTitle className="text-2xl text-[#A63D00]">Post New Problem</CardTitle>
               <CardDescription>
                 Describe your problem and get help from our community of mentors
               </CardDescription>
@@ -160,7 +160,7 @@ export function CreateProblemModal({ isOpen, onClose, onSubmit }: CreateProblemM
               </Button>
               <Button
                 type="submit"
-                className="bg-[#A63D00] hover:bg-[#A63D00]/90"
+                className="bg-[#A63D00] hover:bg-[#A63D00]/90 text-white px-6 py-2 shadow-[4px_4px_0px_0px_#000] transition-all duration-150 min-w-[150px] active:translate-x-0.5 active:translate-y-0.5 active:shadow-[2px_2px_0px_0px_#000]"
                 disabled={isSubmitting || !title.trim() || !description.trim()}
               >
                 {isSubmitting ? (

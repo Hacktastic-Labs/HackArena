@@ -1,3 +1,5 @@
+"use client";
+import { useRouter, usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -9,8 +11,22 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Search, Calendar, MapPin, Users, Plus } from "lucide-react";
+import {
+  Calendar,
+  MapPin,
+  Users,
+  Plus,
+  Search,
+  BookOpen,
+  Clock,
+  Code,
+  Video,
+  Filter,
+  Bell,
+  LogOut,
+} from "lucide-react";
 import Link from "next/link";
+import { useState, useEffect } from "react";
 import {
   getEvents,
   getEventsByOrganizer,
@@ -18,64 +34,86 @@ import {
   registerForEvent,
   cancelEvent,
 } from "./actions";
-import { headers } from "next/headers";
 import { auth } from "../lib/auth";
+import PageTransition from "@/components/PageTransition";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { signOut } from "next-auth/react";
 
-export default async function EventsPage({
+export default function EventsPage({
   searchParams,
 }: {
   searchParams?: { [key: string]: string | string[] | undefined };
 }) {
-  const { data: allEvents, error } = await getEvents();
+  const router = useRouter();
+  const pathname = usePathname();
 
-  // Fetch current user session to identify organiser events
-  const requestHeaders = await headers();
-  const session = await auth.api.getSession({
-    headers: new Headers(requestHeaders),
-  });
-
-  const events = allEvents || [];
-
-  const now = new Date();
-  let upcomingEvents = events.filter((ev) => ev.date >= now);
-  let pastEvents = events.filter((ev) => ev.date < now);
+  const [events, setEvents] = useState([]);
+  const [error, setError] = useState(null);
+  const [session, setSession] = useState(null);
+  const [myEvents, setMyEvents] = useState(null);
+  const [registeredIds, setRegisteredIds] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const rawQ = searchParams?.q ?? "";
-  const searchQuery = (Array.isArray(rawQ) ? rawQ[0] : rawQ)
-    .toLowerCase()
-    .trim();
-  if (searchQuery) {
-    const matchesSearch = (ev: (typeof events)[number]) =>
-      ev.title.toLowerCase().includes(searchQuery) ||
-      (ev.description && ev.description.toLowerCase().includes(searchQuery)) ||
-      ev.location.toLowerCase().includes(searchQuery);
-    upcomingEvents = upcomingEvents.filter(matchesSearch);
-    pastEvents = pastEvents.filter(matchesSearch);
-    // For myEvents and registered filtering we will apply later in render conditionally when we use arrays directly
-  }
+  const searchQuery = (Array.isArray(rawQ) ? rawQ[0] : rawQ || "";
 
-  let myEvents: typeof allEvents | null = null;
-  if (session) {
-    const myEventsResult = await getEventsByOrganizer(session.user.id);
-    if (myEventsResult.success) {
-      myEvents = myEventsResult.data;
+  const now = new Date();
+  const upcomingEvents = events.filter(ev => new Date(ev.date) >= now);
+  const pastEvents = events.filter(ev => new Date(ev.date) < now);
+
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const response = await getEvents();
+        if (response.error) {
+          setError(response.error);
+        } else {
+          setEvents(response.data || []);
+        }
+
+        const authResponse = await auth.api.getSession();
+        setSession(authResponse);
+
+        if (authResponse) {
+          const myEventsResult = await getEventsByOrganizer(authResponse.user.id);
+          if (myEventsResult.success) {
+            setMyEvents(myEventsResult.data);
+          }
+          const registered = await getRegisteredEventIds(authResponse.user.id);
+          setRegisteredIds(registered);
+        }
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setIsLoading(false);
+      }
     }
-  }
 
-  let registeredIds: string[] = [];
-  if (session) {
-    registeredIds = await getRegisteredEventIds(session.user.id);
-  }
+    loadData();
+  }, []);
 
-  // Define a wrapper action for form submission that ignores returned data to satisfy TS
   async function handleRegister(formData: FormData) {
-    "use server";
-    await registerForEvent(formData);
+    if (!session) {
+      router.push("/register");
+      return;
+    }
+    const eventId = formData.get("eventId");
+    await registerForEvent(session.user.id, eventId);
+    const updatedRegisteredIds = await getRegisteredEventIds(session.user.id);
+    setRegisteredIds(updatedRegisteredIds);
   }
 
   async function handleCancel(formData: FormData) {
-    "use server";
-    await cancelEvent(formData);
+    const eventId = formData.get("eventId");
+    await cancelEvent(eventId);
+    const updatedEvents = await getEvents();
+    setEvents(updatedEvents.data || []);
+    const myEventsResult = await getEventsByOrganizer(session.user.id);
+    setMyEvents(myEventsResult.data);
+  }
+
+  if (isLoading) {
+    return <div className="flex justify-center items-center h-screen">Loading...</div>;
   }
 
   return (
@@ -85,262 +123,304 @@ export default async function EventsPage({
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-2">
-              <Link href="/" className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-[#A63D00] rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-lg">H</span>
-                </div>
-                <span className="text-2xl font-bold text-[#A63D00]">
-                  HackArena
+              <img
+                src="/sfinal.png"
+                alt="Synora Logo"
+                className="w-12 h-12 rounded-md shadow object-contain p-0"
+              />
+              <div className="flex flex-col justify-center">
+                <span className="text-2xl font-bold text-gray-900 font-inter leading-tight">
+                  Synora
                 </span>
-              </Link>
+                <span className="text-base text-gray-400 leading-tight">
+                  by Hacktastic
+                </span>
+              </div>
             </div>
-            <div className="hidden md:flex items-center space-x-8">
-              <Link
-                href="/dashboard"
-                className="text-gray-700 hover:text-[#A63D00] transition-colors"
+            <div className="flex items-center space-x-4">
+              <Button
+                className={`px-5 py-2 rounded-lg font-bold border-2
+                  ${pathname === "/dashboard" ?
+                    'bg-[#232323] text-[#FFB74D] border-[#FFB74D] shadow-[6px_6px_0px_0px_#000000]' :
+                    'bg-transparent text-black border-transparent hover:bg-[#FFF8E1] hover:text-[#A63D00] transition-all duration-300'}
+                `}
+                onClick={() => router.push("/dashboard")}
               >
                 Dashboard
-              </Link>
-              <Link
-                href="/problems"
-                className="text-gray-700 hover:text-[#A63D00] transition-colors"
+              </Button>
+              <Button
+                className={`px-5 py-2 rounded-lg font-bold border-2
+                  ${pathname === "/problems" ?
+                    'bg-[#232323] text-[#FFB74D] border-[#FFB74D] shadow-[6px_6px_0px_0px_#000000]' :
+                    'bg-transparent text-black border-transparent hover:bg-[#FFF8E1] hover:text-[#A63D00] transition-all duration-300'}
+                `}
+                onClick={() => router.push("/problems")}
               >
                 My Problems
-              </Link>
-              <Link
-                href="/mentors"
-                className="text-gray-700 hover:text-[#A63D00] transition-colors"
+              </Button>
+              <Button
+                className={`px-5 py-2 rounded-lg font-bold border-2
+                  ${pathname === "/mentors" ?
+                    'bg-[#232323] text-[#FFB74D] border-[#FFB74D] shadow-[6px_6px_0px_0px_#000000]' :
+                    'bg-transparent text-black border-transparent hover:bg-[#FFF8E1] hover:text-[#A63D00] transition-all duration-300'}
+                `}
+                onClick={() => router.push("/mentors")}
               >
                 Mentors
-              </Link>
-              <Link
-                href="/knowledge"
-                className="text-gray-700 hover:text-[#A63D00] transition-colors"
+              </Button>
+              <Button
+                className={`px-5 py-2 rounded-lg font-bold border-2
+                  ${pathname === "/knowledge" ?
+                    'bg-[#232323] text-[#FFB74D] border-[#FFB74D] shadow-[6px_6px_0px_0px_#000000]' :
+                    'bg-transparent text-black border-transparent hover:bg-[#FFF8E1] hover:text-[#A63D00] transition-all duration-300'}
+                `}
+                onClick={() => router.push("/knowledge")}
               >
                 Knowledge
-              </Link>
-              <Link href="/events" className="text-[#A63D00] font-medium">
+              </Button>
+              <Button
+                className={`px-5 py-2 rounded-lg font-bold border-2
+                  ${pathname === "/events" ?
+                    'bg-[#232323] text-[#FFB74D] border-[#FFB74D] shadow-[6px_6px_0px_0px_#000000]' :
+                    'bg-transparent text-black border-transparent hover:bg-[#FFF8E1] hover:text-[#A63D00] transition-all duration-300'}
+                `}
+                onClick={() => router.push("/events")}
+              >
                 Events
-              </Link>
-              <Link
-                href="/updates"
-                className="text-gray-700 hover:text-[#A63D00] transition-colors"
+              </Button>
+              <Button
+                className={`px-5 py-2 rounded-lg font-bold border-2
+                  ${pathname === "/updates" ?
+                    'bg-[#232323] text-[#FFB74D] border-[#FFB74D] shadow-[6px_6px_0px_0px_#000000]' :
+                    'bg-transparent text-black border-transparent hover:bg-[#FFF8E1] hover:text-[#A63D00] transition-all duration-300'}
+                `}
+                onClick={() => router.push("/updates")}
               >
                 Updates
-              </Link>
+              </Button>
+              <Button variant="ghost" size="sm" className="group relative p-0 w-8 h-8 flex items-center justify-center">
+                <Bell className="h-8 w-8 group-hover:fill-[#A63D00] group-hover:text-[#A63D00] transition-all duration-300 group-hover:animate-pulse" />
+                <div className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-[#A63D00] rounded-full group-hover:animate-ping"></div>
+              </Button>
+              <Avatar className="w-8 h-8">
+                <AvatarImage src="/placeholder.svg?height=32&width=32" />
+                <AvatarFallback className="bg-[#A63D00] text-white text-base font-bold">
+                  {session?.user?.name?.charAt(0)?.toUpperCase() || "S"}
+                </AvatarFallback>
+              </Avatar>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="p-0 w-8 h-8 flex items-center justify-center"
+                onClick={async () => {
+                  await signOut();
+                  router.push("/register");
+                }}
+              >
+                <LogOut className="h-8 w-8" />
+              </Button>
             </div>
           </div>
         </div>
       </nav>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            Events & Workshops
-          </h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Join our community events, workshops, and study groups to accelerate
-            your learning journey.
-          </p>
-        </div>
-
-        {/* Search and Create */}
-        <div className="flex flex-col md:flex-row gap-4 mb-8">
-          <form className="flex-1 relative" method="get" action="/events">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-            <Input
-              name="q"
-              defaultValue={Array.isArray(rawQ) ? rawQ[0] : rawQ}
-              placeholder="Search events..."
-              className="pl-10"
-            />
-          </form>
-          <Link href="/events/create">
-            <Button className="bg-[#A63D00] hover:bg-[#A63D00]/90">
-              <Plus className="h-4 w-4 mr-2" />
+      <PageTransition>
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+          {/* Header */}
+          <div className="flex items-center justify-between mb-6">
+            <h1 className="text-3xl font-bold">Events</h1>
+            <Link
+              href="/events/create"
+              className="inline-flex items-center px-4 py-2 bg-[#A63D00] text-white rounded hover:bg-[#A63D00]/90 text-sm font-semibold"
+            >
+              <Plus className="w-4 h-4 mr-2" />
               Create Event
-            </Button>
-          </Link>
-        </div>
+            </Link>
+          </div>
 
-        {/* Event Tabs */}
-        <Tabs defaultValue="upcoming" className="space-y-8">
-          <TabsList className="grid w-full grid-cols-4 bg-white border border-[#A63D00]/20">
-            <TabsTrigger
-              value="upcoming"
-              className="data-[state=active]:bg-[#A63D00] data-[state=active]:text-white"
-            >
-              Upcoming
-            </TabsTrigger>
-            <TabsTrigger
-              value="past"
-              className="data-[state=active]:bg-[#A63D00] data-[state=active]:text-white"
-            >
-              Past Events
-            </TabsTrigger>
-            <TabsTrigger
-              value="my-events"
-              className="data-[state=active]:bg-[#A63D00] data-[state=active]:text-white"
-            >
-              My Events
-            </TabsTrigger>
-            <TabsTrigger
-              value="registered"
-              className="data-[state=active]:bg-[#A63D00] data-[state=active]:text-white"
-            >
-              Registered
-            </TabsTrigger>
-          </TabsList>
+          {/* Search */}
+          <div className="mb-8">
+            <form className="relative" method="get" action="/events">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+              <Input
+                name="q"
+                defaultValue={searchQuery}
+                placeholder="Search events..."
+                className="pl-10"
+              />
+            </form>
+          </div>
 
-          <TabsContent value="upcoming" className="space-y-6">
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {error && <p className="text-red-500">Could not fetch events.</p>}
-              {upcomingEvents && upcomingEvents.length > 0 ? (
-                upcomingEvents.map((event) => (
-                  <Card
-                    key={event.id}
-                    className="border-[#A63D00]/20 hover:shadow-lg transition-shadow"
-                  >
-                    <CardHeader>
-                      <CardTitle className="text-xl">{event.title}</CardTitle>
-                      <CardDescription>{event.description}</CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div className="space-y-2">
-                        <div className="flex items-center space-x-2 text-sm text-gray-600">
-                          <Calendar className="h-4 w-4" />
-                          <span>{new Date(event.date).toLocaleString()}</span>
-                        </div>
-                        <div className="flex items-center space-x-2 text-sm text-gray-600">
-                          <MapPin className="h-4 w-4" />
-                          <span>{event.location}</span>
-                        </div>
-                        <div className="flex items-center space-x-2 text-sm text-gray-600">
-                          <Users className="h-4 w-4" />
-                          <span>Organized by {event.organizer.name}</span>
-                        </div>
-                      </div>
-                      {session && event.organizerId === session.user.id ? (
-                        <Link href={`/events/${event.id}`} className="w-full">
-                          <Button
-                            variant="outline"
-                            disabled
-                            className="w-full border-[#A63D00] text-[#A63D00]/70 cursor-not-allowed"
-                          >
-                            Your Event
-                          </Button>
-                        </Link>
-                      ) : session && registeredIds.includes(event.id) ? (
-                        <Link href={`/events/${event.id}`} className="w-full">
-                          <Button
-                            variant="outline"
-                            disabled
-                            className="w-full border-[#A63D00] text-[#A63D00]/70 cursor-not-allowed"
-                          >
-                            Registered
-                          </Button>
-                        </Link>
-                      ) : session ? (
-                        <form action={handleRegister} className="w-full">
-                          <input
-                            type="hidden"
-                            name="eventId"
-                            value={event.id}
-                          />
-                          <Button
-                            type="submit"
-                            className="w-full bg-[#A63D00] hover:bg-[#A63D00]/90"
-                          >
-                            Register Now
-                          </Button>
-                        </form>
-                      ) : (
-                        <Link href="/register" className="w-full">
-                          <Button className="w-full bg-[#A63D00] hover:bg-[#A63D00]/90">
-                            Register Now
-                          </Button>
-                        </Link>
-                      )}
-                    </CardContent>
-                  </Card>
-                ))
-              ) : (
-                <p>No upcoming events found.</p>
-              )}
-            </div>
-          </TabsContent>
+          {/* Event Tabs */}
+          <Tabs defaultValue="upcoming" className="space-y-8">
+            <TabsList className="grid w-full grid-cols-4 bg-white border border-[#A63D00]/20">
+              <TabsTrigger
+                value="upcoming"
+                className="data-[state=active]:bg-[#A63D00] data-[state=active]:text-white"
+              >
+                Upcoming
+              </TabsTrigger>
+              <TabsTrigger
+                value="past"
+                className="data-[state=active]:bg-[#A63D00] data-[state=active]:text-white"
+              >
+                Past
+              </TabsTrigger>
+              <TabsTrigger
+                value="my-events"
+                className="data-[state=active]:bg-[#A63D00] data-[state=active]:text-white"
+              >
+                My Events
+              </TabsTrigger>
+              <TabsTrigger
+                value="registered"
+                className="data-[state=active]:bg-[#A63D00] data-[state=active]:text-white"
+              >
+                Registered
+              </TabsTrigger>
+            </TabsList>
 
-          <TabsContent value="past" className="space-y-6">
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {pastEvents.length > 0 ? (
-                pastEvents.map((event) => (
-                  <Card
-                    key={event.id}
-                    className="border-[#A63D00]/20 hover:shadow-lg transition-shadow"
-                  >
-                    <CardHeader>
-                      <CardTitle className="text-xl">{event.title}</CardTitle>
-                      <CardDescription>{event.description}</CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div className="space-y-2">
-                        <div className="flex items-center space-x-2 text-sm text-gray-600">
-                          <Calendar className="h-4 w-4" />
-                          <span>{new Date(event.date).toLocaleString()}</span>
-                        </div>
-                        <div className="flex items-center space-x-2 text-sm text-gray-600">
-                          <MapPin className="h-4 w-4" />
-                          <span>{event.location}</span>
-                        </div>
-                        <div className="flex items-center space-x-2 text-sm text-gray-600">
-                          <Users className="h-4 w-4" />
-                          <span>Organized by {event.organizer.name}</span>
-                        </div>
-                      </div>
-                      <Link href={`/events/${event.id}`} className="w-full">
-                        <Button
-                          variant="outline"
-                          className="w-full border-[#A63D00] text-[#A63D00] hover:bg-[#A63D00]/10"
-                        >
-                          View Details
-                        </Button>
-                      </Link>
-                    </CardContent>
-                  </Card>
-                ))
-              ) : (
-                <p>No past events found.</p>
-              )}
-            </div>
-          </TabsContent>
-
-          {/* My Events */}
-          <TabsContent value="my-events" className="space-y-6">
-            {session ? (
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {myEvents && myEvents.length > 0 ? (
-                  myEvents.map((event) => (
-                    <Card
+            {/* Upcoming Events */}
+            <TabsContent value="upcoming" className="space-y-6">
+              <div className="grid grid-cols-1 gap-4">
+                {error && <p className="text-red-500">Could not fetch events.</p>}
+                {upcomingEvents.length === 0 ? (
+                  <p className="text-gray-600">No upcoming events found.</p>
+                ) : (
+                  upcomingEvents.map((event) => (
+                    <div
                       key={event.id}
-                      className="border-[#A63D00]/20 hover:shadow-lg transition-shadow"
+                      className="border-2 border-black p-6 rounded-md bg-[#FFF8E1] hover:shadow-xl transition-all"
                     >
-                      <CardHeader>
-                        <CardTitle className="text-xl">{event.title}</CardTitle>
-                        <CardDescription>{event.description}</CardDescription>
-                      </CardHeader>
-                      <CardContent className="space-y-4">
-                        <div className="space-y-2">
-                          <div className="flex items-center space-x-2 text-sm text-gray-600">
-                            <Calendar className="h-4 w-4" />
-                            <span>{new Date(event.date).toLocaleString()}</span>
-                          </div>
-                          <div className="flex items-center space-x-2 text-sm text-gray-600">
-                            <MapPin className="h-4 w-4" />
-                            <span>{event.location}</span>
-                          </div>
+                      <div className="flex justify-between items-center mb-2">
+                        <h2 className="text-xl font-bold text-[#232323]">{event.title}</h2>
+                        <span className="text-sm text-gray-700">
+                          {new Date(event.date).toLocaleDateString()}
+                        </span>
+                      </div>
+                      <p className="text-[#232323] mb-2">{event.description}</p>
+                      <div className="flex items-center space-x-4 text-sm text-gray-700">
+                        <span className="flex items-center">
+                          <MapPin className="h-4 w-4 mr-1" /> {event.location}
+                        </span>
+                        <span className="flex items-center">
+                          <Users className="h-4 w-4 mr-1" /> {event.organizer.name}
+                        </span>
+                      </div>
+                      <div className="mt-4">
+                        {session && event.organizerId === session.user.id ? (
+                          <Link href={`/events/${event.id}`} className="w-full">
+                            <Button
+                              variant="outline"
+                              disabled
+                              className="w-full border-[#A63D00] text-[#A63D00]/70 cursor-not-allowed"
+                            >
+                              Your Event
+                            </Button>
+                          </Link>
+                        ) : session && registeredIds.includes(event.id) ? (
+                          <Link href={`/events/${event.id}`} className="w-full">
+                            <Button
+                              variant="outline"
+                              disabled
+                              className="w-full border-[#A63D00] text-[#A63D00]/70 cursor-not-allowed"
+                            >
+                              Registered
+                            </Button>
+                          </Link>
+                        ) : session ? (
+                          <form action={handleRegister} className="w-full">
+                            <input
+                              type="hidden"
+                              name="eventId"
+                              value={event.id}
+                            />
+                            <Button
+                              type="submit"
+                              className="w-full bg-[#A63D00] hover:bg-[#A63D00]/90"
+                            >
+                              Register Now
+                            </Button>
+                          </form>
+                        ) : (
+                          <Link href="/register" className="w-full">
+                            <Button className="w-full bg-[#A63D00] hover:bg-[#A63D00]/90">
+                              Register Now
+                            </Button>
+                          </Link>
+                        )}
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </TabsContent>
+
+            {/* Past Events */}
+            <TabsContent value="past" className="space-y-6">
+              <div className="grid grid-cols-1 gap-4">
+                {pastEvents.length === 0 ? (
+                  <p className="text-gray-600">No past events found.</p>
+                ) : (
+                  pastEvents.map((event) => (
+                    <div
+                      key={event.id}
+                      className="border-2 border-black p-6 rounded-md bg-[#FFF8E1] hover:shadow-xl transition-all"
+                    >
+                      <div className="flex justify-between items-center mb-2">
+                        <h2 className="text-xl font-bold text-[#232323]">{event.title}</h2>
+                        <span className="text-sm text-gray-700">
+                          {new Date(event.date).toLocaleDateString()}
+                        </span>
+                      </div>
+                      <p className="text-[#232323] mb-2">{event.description}</p>
+                      <div className="flex items-center space-x-4 text-sm text-gray-700">
+                        <span className="flex items-center">
+                          <MapPin className="h-4 w-4 mr-1" /> {event.location}
+                        </span>
+                        <span className="flex items-center">
+                          <Users className="h-4 w-4 mr-1" /> {event.organizer.name}
+                        </span>
+                      </div>
+                      <div className="mt-4">
+                        <Link href={`/events/${event.id}`} className="w-full">
+                          <Button
+                            variant="outline"
+                            className="w-full border-[#A63D00] text-[#A63D00] hover:bg-[#A63D00]/10"
+                          >
+                            View Details
+                          </Button>
+                        </Link>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </TabsContent>
+
+            {/* My Events */}
+            <TabsContent value="my-events" className="space-y-6">
+              {session ? (
+                <div className="grid grid-cols-1 gap-4">
+                  {myEvents && myEvents.length > 0 ? (
+                    myEvents.map((event) => (
+                      <div
+                        key={event.id}
+                        className="border-2 border-black p-6 rounded-md bg-[#FFF8E1] hover:shadow-xl transition-all"
+                      >
+                        <div className="flex justify-between items-center mb-2">
+                          <h2 className="text-xl font-bold text-[#232323]">{event.title}</h2>
+                          <span className="text-sm text-gray-700">
+                            {new Date(event.date).toLocaleDateString()}
+                          </span>
                         </div>
-                        <div className="flex space-x-2">
+                        <p className="text-[#232323] mb-2">{event.description}</p>
+                        <div className="flex items-center space-x-4 text-sm text-gray-700">
+                          <span className="flex items-center">
+                            <MapPin className="h-4 w-4 mr-1" /> {event.location}
+                          </span>
+                        </div>
+                        <div className="mt-4 flex space-x-2">
                           <Link href={`/events/${event.id}`} className="flex-1">
                             <Button
                               variant="outline"
@@ -360,91 +440,77 @@ export default async function EventsPage({
                             </Button>
                           </form>
                         </div>
-                      </CardContent>
-                    </Card>
-                  ))
-                ) : (
-                  <p>You haven't organised any events yet.</p>
-                )}
-              </div>
-            ) : (
-              <p className="text-center">Please log in to view your events.</p>
-            )}
-          </TabsContent>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-gray-600">You haven't organized any events yet.</p>
+                  )}
+                </div>
+              ) : (
+                <p className="text-gray-600">Please log in to view your events.</p>
+              )}
+            </TabsContent>
 
-          {/* Registered Events */}
-          <TabsContent value="registered" className="space-y-6">
-            {session ? (
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {events &&
-                events.filter((e) => registeredIds.includes(e.id)).length >
-                  0 ? (
-                  events
-                    .filter((e) => registeredIds.includes(e.id))
-                    .map((event) => (
-                      <Card
-                        key={event.id}
-                        className="border-[#A63D00]/20 hover:shadow-lg transition-shadow"
-                      >
-                        <CardHeader>
-                          <CardTitle className="text-xl">
-                            {event.title}
-                          </CardTitle>
-                          <CardDescription>{event.description}</CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                          <div className="space-y-2">
-                            <div className="flex items-center space-x-2 text-sm text-gray-600">
-                              <Calendar className="h-4 w-4" />
-                              <span>
-                                {new Date(event.date).toLocaleString()}
-                              </span>
-                            </div>
-                            <div className="flex items-center space-x-2 text-sm text-gray-600">
-                              <MapPin className="h-4 w-4" />
-                              <span>{event.location}</span>
-                            </div>
-                            <div className="flex items-center space-x-2 text-sm text-gray-600">
-                              <Users className="h-4 w-4" />
-                              <span>Organized by {event.organizer.name}</span>
-                            </div>
+            {/* Registered Events */}
+            <TabsContent value="registered" className="space-y-6">
+              {session ? (
+                <div className="grid grid-cols-1 gap-4">
+                  {events.filter(e => registeredIds.includes(e.id)).length > 0 ? (
+                    events
+                      .filter(e => registeredIds.includes(e.id))
+                      .map((event) => (
+                        <div
+                          key={event.id}
+                          className="border-2 border-black p-6 rounded-md bg-[#FFF8E1] hover:shadow-xl transition-all"
+                        >
+                          <div className="flex justify-between items-center mb-2">
+                            <h2 className="text-xl font-bold text-[#232323]">{event.title}</h2>
+                            <span className="text-sm text-gray-700">
+                              {new Date(event.date).toLocaleDateString()}
+                            </span>
                           </div>
-                          {event.date < now ? (
-                            <Button
-                              variant="outline"
-                              disabled
-                              className="w-full border-[#A63D00] text-[#A63D00]/70 cursor-not-allowed"
-                            >
-                              Ended
-                            </Button>
-                          ) : (
-                            <Link
-                              href={`/events/${event.id}`}
-                              className="w-full"
-                            >
+                          <p className="text-[#232323] mb-2">{event.description}</p>
+                          <div className="flex items-center space-x-4 text-sm text-gray-700">
+                            <span className="flex items-center">
+                              <MapPin className="h-4 w-4 mr-1" /> {event.location}
+                            </span>
+                            <span className="flex items-center">
+                              <Users className="h-4 w-4 mr-1" /> {event.organizer.name}
+                            </span>
+                          </div>
+                          <div className="mt-4">
+                            {new Date(event.date) < now ? (
                               <Button
                                 variant="outline"
-                                className="w-full border-[#A63D00] text-[#A63D00] hover:bg-[#A63D00]/10"
+                                disabled
+                                className="w-full border-[#A63D00] text-[#A63D00]/70 cursor-not-allowed"
                               >
-                                View Details
+                                Ended
                               </Button>
-                            </Link>
-                          )}
-                        </CardContent>
-                      </Card>
-                    ))
-                ) : (
-                  <p>You haven't registered for any events yet.</p>
-                )}
-              </div>
-            ) : (
-              <p className="text-center">
-                Please log in to view your registrations.
-              </p>
-            )}
-          </TabsContent>
-        </Tabs>
-      </div>
+                            ) : (
+                              <Link href={`/events/${event.id}`} className="w-full">
+                                <Button
+                                  variant="outline"
+                                  className="w-full border-[#A63D00] text-[#A63D00] hover:bg-[#A63D00]/10"
+                                >
+                                  View Details
+                                </Button>
+                              </Link>
+                            )}
+                          </div>
+                        </div>
+                      ))
+                  ) : (
+                    <p className="text-gray-600">You haven't registered for any events yet.</p>
+                  )}
+                </div>
+              ) : (
+                <p className="text-gray-600">Please log in to view your registrations.</p>
+              )}
+            </TabsContent>
+          </Tabs>
+        </div>
+      </PageTransition>
     </div>
   );
 }
