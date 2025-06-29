@@ -10,6 +10,17 @@ export async function GET(_request: NextRequest) {
       where: {
         role: "MENTOR",
       },
+      select: {
+        id: true,
+        email: true,
+        emailVerified: true,
+        name: true,
+        username: true,
+        image: true,
+        role: true,
+        createdAt: true,
+        updatedAt: true,
+      },
     });
     console.log("Mentors found in database:", mentors);
     return NextResponse.json(mentors);
@@ -20,4 +31,4 @@ export async function GET(_request: NextRequest) {
       { status: 500 }
     );
   }
-}
+} 

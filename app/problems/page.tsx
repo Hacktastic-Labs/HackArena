@@ -286,15 +286,32 @@ export default function ProblemsPage() {
                           ))}
                         </div>
                       )}
-                      <div className="flex items-center justify-between mt-4">
-                        {statusBadge}
-                        <div className="text-sm text-gray-600 font-semibold">Created {new Date(problem.createdAt).toLocaleDateString()}</div>
-                        {problem.mentor ? (
-                          <button className="bg-[#FDFCF8] text-black font-bold rounded-md px-6 py-2 border-2 border-black transition-transform duration-150 hover:scale-105 hover:shadow-[2px_2px_0_0_#000]" style={{ borderColor: 'black', borderStyle: 'solid' }}>Chat</button>
-                        ) : (
-                          <button className="bg-[#FDFCF8] text-black font-bold rounded-md px-6 py-2 border-2 border-black transition-transform duration-150 hover:scale-105 hover:shadow-[2px_2px_0_0_#000]" style={{ borderColor: 'black', borderStyle: 'solid' }}>Find Mentor</button>
-                        )}
-                      </div>
+<div className="flex items-center justify-between mt-6 flex-wrap gap-2">
+  {/* Status Badge */}
+  {statusBadge}
+
+  {/* Created Date */}
+  <div className="text-sm text-gray-600 font-semibold">
+    Created {new Date(problem.createdAt).toLocaleDateString()}
+  </div>
+
+  {/* Action Button */}
+  {problem.mentor ? (
+    <button
+      onClick={() => router.push(`/problems/${problem.id}`)}
+      className="bg-[#FDFCF8] text-black font-bold rounded-md px-6 py-2 border-2 border-black transition-transform duration-150 hover:scale-105 hover:shadow-[2px_2px_0_0_#000]"
+    >
+      Chat
+    </button>
+  ) : (
+    <button
+      className="bg-[#FDFCF8] text-black font-bold rounded-md px-6 py-2 border-2 border-black transition-transform duration-150 hover:scale-105 hover:shadow-[2px_2px_0_0_#000]"
+    >
+      Find Mentor
+    </button>
+  )}
+</div>
+
                     </div>
                   </div>
                 );

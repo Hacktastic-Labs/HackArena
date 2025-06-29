@@ -15,6 +15,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea"; // Assuming you have a Textarea component
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 type FormState = {
   success: boolean;
@@ -49,7 +51,14 @@ function SubmitButton() {
 }
 
 export default function CreateEventPage() {
+  const router = useRouter();
   const [state, formAction] = useFormState(createEvent, initialState);
+
+  useEffect(() => {
+    if (state.success) {
+      router.push("/events");
+    }
+  }, [state.success, router]);
 
   return (
     <div className="min-h-screen bg-[#FFE8CC]/20 flex items-center justify-center p-4">

@@ -1,33 +1,75 @@
 "use client";
 
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Button } from "@/components/ui/button";
 import {
   Clock,
   Bell,
   LogOut,
-} from "lucide-react"
-import { useSession } from "@/app/lib/auth-client";
+} from "lucide-react";
+
 import { useRouter, usePathname } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { signOut } from "@/app/lib/auth-client";
+
+import { useSession, signOut } from "@/app/lib/auth-client";
 import PageTransition from "@/components/PageTransition";
+
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+
+import { Badge } from "@/components/ui/badge";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/components/ui/avatar";
+
+
+const getButtonClasses = (path: string, currentPath: string) => {
+  const baseClasses = "px-5 py-2 rounded-lg font-bold border-2";
+  const activeClasses = "bg-[#232323] text-[#FFB74D] border-[#FFB74D] shadow-[6px_6px_0px_0px_#000000]";
+  const inactiveClasses = "bg-transparent text-black border-transparent hover:bg-[#FFF8E1] hover:text-[#A63D00] transition-all duration-300";
+
+  return `${baseClasses} ${currentPath === path ? activeClasses : inactiveClasses}`;
+};
 
 export default function UpdatesPage() {
   const { data: session, isPending } = useSession();
   const router = useRouter();
   const pathname = usePathname();
+  const [announcements, setAnnouncements] = useState<any[]>([]);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   useEffect(() => {
     if (!isPending && !session) {
       router.push("/register");
-    } else if (!isPending && (session?.user as { role?: string })?.role === "MENTOR") {
+    } else if (
+      !isPending &&
+      (session?.user as { role?: string })?.role === "MENTOR"
+    ) {
       router.push("/mentor-dashboard");
     }
   }, [session, isPending, router]);
+
+  useEffect(() => {
+    async function load() {
+      try {
+        const res = await fetch("/api/announcements");
+        if (res.ok) {
+          const data = await res.json();
+          setAnnouncements(data);
+        }
+      } catch (err) {
+        console.error("Failed to load announcements", err);
+      }
+    }
+    load();
+  }, []);
 
   if (isPending) {
     return (
@@ -67,66 +109,46 @@ export default function UpdatesPage() {
             </div>
             <div className="flex items-center space-x-4">
               <Button
-                className={`px-5 py-2 rounded-lg font-bold border-2
-                  ${pathname === "/dashboard" ?
-                    'bg-[#232323] text-[#FFB74D] border-[#FFB74D] shadow-[6px_6px_0px_0px_#000000]' :
-                    'bg-transparent text-black border-transparent hover:bg-[#FFF8E1] hover:text-[#A63D00] transition-all duration-300'}
-                `}
+                className={getButtonClasses("/dashboard", pathname)}
                 onClick={() => router.push("/dashboard")}
               >
                 Dashboard
               </Button>
               <Button
-                className={`px-5 py-2 rounded-lg font-bold border-2
-                  ${pathname === "/problems" ?
-                    'bg-[#232323] text-[#FFB74D] border-[#FFB74D] shadow-[6px_6px_0px_0px_#000000]' :
-                    'bg-transparent text-black border-transparent hover:bg-[#FFF8E1] hover:text-[#A63D00] transition-all duration-300'}
-                `}
+                className={getButtonClasses("/problems", pathname)}
                 onClick={() => router.push("/problems")}
               >
                 My Problems
               </Button>
               <Button
-                className={`px-5 py-2 rounded-lg font-bold border-2
-                  ${pathname === "/mentors" ?
-                    'bg-[#232323] text-[#FFB74D] border-[#FFB74D] shadow-[6px_6px_0px_0px_#000000]' :
-                    'bg-transparent text-black border-transparent hover:bg-[#FFF8E1] hover:text-[#A63D00] transition-all duration-300'}
-                `}
+                className={getButtonClasses("/mentors", pathname)}
                 onClick={() => router.push("/mentors")}
               >
                 Mentors
               </Button>
               <Button
-                className={`px-5 py-2 rounded-lg font-bold border-2
-                  ${pathname === "/knowledge" ?
-                    'bg-[#232323] text-[#FFB74D] border-[#FFB74D] shadow-[6px_6px_0px_0px_#000000]' :
-                    'bg-transparent text-black border-transparent hover:bg-[#FFF8E1] hover:text-[#A63D00] transition-all duration-300'}
-                `}
+                className={getButtonClasses("/knowledge", pathname)}
                 onClick={() => router.push("/knowledge")}
               >
                 Knowledge
               </Button>
               <Button
-                className={`px-5 py-2 rounded-lg font-bold border-2
-                  ${pathname === "/events" ?
-                    'bg-[#232323] text-[#FFB74D] border-[#FFB74D] shadow-[6px_6px_0px_0px_#000000]' :
-                    'bg-transparent text-black border-transparent hover:bg-[#FFF8E1] hover:text-[#A63D00] transition-all duration-300'}
-                `}
+                className={getButtonClasses("/events", pathname)}
                 onClick={() => router.push("/events")}
               >
                 Events
               </Button>
               <Button
-                className={`px-5 py-2 rounded-lg font-bold border-2
-                  ${pathname === "/updates" ?
-                    'bg-[#232323] text-[#FFB74D] border-[#FFB74D] shadow-[6px_6px_0px_0px_#000000]' :
-                    'bg-transparent text-black border-transparent hover:bg-[#FFF8E1] hover:text-[#A63D00] transition-all duration-300'}
-                `}
+                className={getButtonClasses("/updates", pathname)}
                 onClick={() => router.push("/updates")}
               >
                 Updates
               </Button>
-              <Button variant="ghost" size="sm" className="group relative p-0 w-8 h-8 flex items-center justify-center">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="group relative p-0 w-8 h-8 flex items-center justify-center"
+              >
                 <Bell className="h-8 w-8 group-hover:fill-[#A63D00] group-hover:text-[#A63D00] transition-all duration-300 group-hover:animate-pulse" />
                 <div className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-[#A63D00] rounded-full group-hover:animate-ping"></div>
               </Button>
@@ -155,122 +177,91 @@ export default function UpdatesPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex justify-between items-center mb-8">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">Latest Updates</h1>
-              <p className="text-gray-600">Stay updated with the latest announcements and platform news.</p>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                Latest Updates
+              </h1>
+              <p className="text-gray-600">
+                Stay updated with the latest announcements and platform news.
+              </p>
             </div>
-            <Button variant="outline" className="border-[#A63D00] text-[#A63D00] bg-transparent">
-              Mark All Read
-            </Button>
+            <div className="flex gap-2">
+              {session && (
+                <Button
+                  variant="outline"
+                  disabled={isRefreshing}
+                  onClick={async () => {
+                    setIsRefreshing(true);
+                    try {
+                      await fetch("/api/technews/refresh");
+                      const res = await fetch("/api/announcements");
+                      if (res.ok) {
+                        setAnnouncements(await res.json());
+                      }
+                    } catch (err) {
+                      console.error(err);
+                    } finally {
+                      setIsRefreshing(false);
+                    }
+                  }}
+                  className="border-[#A63D00] text-[#A63D00] bg-transparent"
+                >
+                  {isRefreshing ? "Refreshing..." : "Refresh Tech News"}
+                </Button>
+              )}
+              <Button
+                variant="outline"
+                className="border-[#A63D00] text-[#A63D00] bg-transparent"
+              >
+                Mark All Read
+              </Button>
+            </div>
           </div>
 
           <div className="space-y-4">
-            <Card className="border-[#A63D00]/20 border-l-4 border-l-[#A63D00]">
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div>
-                    <CardTitle className="text-lg">New AI-Powered Mentor Matching</CardTitle>
-                    <CardDescription className="mt-2">
-                      We&apos;ve upgraded our mentor matching algorithm to provide even better suggestions based on your
-                      learning goals and preferences.
-                    </CardDescription>
+            {announcements.map((a) => (
+              <Card
+                key={a.id}
+                className="border-[#A63D00]/20 border-l-4 border-l-[#A63D00] hover:bg-gray-50 cursor-pointer"
+                onClick={() => a.url && window.open(a.url, "_blank")}
+              >
+                <CardHeader>
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <CardTitle className="text-lg">{a.title}</CardTitle>
+                      {a.description && (
+                        <CardDescription className="mt-2">
+                          {a.url ? (
+                            <a
+                              href={a.url}
+                              className="underline text-blue-600 hover:text-blue-800"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              {a.description}
+                            </a>
+                          ) : (
+                            a.description
+                          )}
+                        </CardDescription>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {a.source && <Badge variant="secondary">{a.source}</Badge>}
+                      <Badge variant="outline">{a.category}</Badge>
+                    </div>
                   </div>
-                  <Badge className="bg-[#A63D00]/10 text-[#A63D00]">New Feature</Badge>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center space-x-2 text-sm text-gray-600">
-                  <Clock className="h-4 w-4" />
-                  <span>2 hours ago</span>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="border-[#A63D00]/20">
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div>
-                    <CardTitle className="text-lg">Upcoming Maintenance</CardTitle>
-                    <CardDescription className="mt-2">
-                      Scheduled maintenance on December 20th from 2:00 AM to 4:00 AM EST. The platform will be
-                      temporarily unavailable.
-                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-center space-x-2 text-sm text-gray-600">
+                    <Clock className="h-4 w-4" />
+                    <span>{a.timeAgo || "Just now"}</span>
                   </div>
-                  <Badge variant="outline">Maintenance</Badge>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center space-x-2 text-sm text-gray-600">
-                  <Clock className="h-4 w-4" />
-                  <span>1 day ago</span>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="border-[#A63D00]/20">
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div>
-                    <CardTitle className="text-lg">New React Workshop Added</CardTitle>
-                    <CardDescription className="mt-2">
-                      Join our upcoming React Advanced Patterns workshop this Friday. Learn about complex state management
-                      and performance optimization techniques.
-                    </CardDescription>
-                  </div>
-                  <Badge className="bg-blue-100 text-blue-800">Workshop</Badge>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center space-x-2 text-sm text-gray-600">
-                  <Clock className="h-4 w-4" />
-                  <span>3 days ago</span>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="border-[#A63D00]/20">
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div>
-                    <CardTitle className="text-lg">Platform Performance Improvements</CardTitle>
-                    <CardDescription className="mt-2">
-                      We&apos;ve made significant improvements to page load times and overall platform responsiveness.
-                      You should notice faster navigation and smoother interactions.
-                    </CardDescription>
-                  </div>
-                  <Badge className="bg-green-100 text-green-800">Enhancement</Badge>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center space-x-2 text-sm text-gray-600">
-                  <Clock className="h-4 w-4" />
-                  <span>1 week ago</span>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="border-[#A63D00]/20">
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div>
-                    <CardTitle className="text-lg">New Knowledge Base Articles</CardTitle>
-                    <CardDescription className="mt-2">
-                      We&apos;ve added 15 new articles covering advanced JavaScript concepts, React best practices,
-                      and database optimization techniques.
-                    </CardDescription>
-                  </div>
-                  <Badge className="bg-purple-100 text-purple-800">Content</Badge>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center space-x-2 text-sm text-gray-600">
-                  <Clock className="h-4 w-4" />
-                  <span>2 weeks ago</span>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         </div>
       </PageTransition>
     </div>
-  )
-} 
+  );
+}
