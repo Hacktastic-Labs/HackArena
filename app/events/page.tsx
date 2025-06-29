@@ -59,6 +59,38 @@ interface Event {
   };
 }
 
+const BRUTALIST_COLORS = [
+  '#FFF8E1', '#FFD580', '#FDE1BC', '#FFB800', '#F96D3A', '#FFEDC2'
+];
+
+const EventCard = ({ event, isRegistered, onRegister, onCancel, session, color }: { event: Event, isRegistered: boolean, onRegister: any, onCancel: any, session: any, color: string }) => (
+    <Card className="border-4 border-black rounded-lg shadow-[8px_8px_0px_0px_#000] overflow-hidden" style={{ backgroundColor: color }}>
+        <CardHeader className="border-b-4 border-black p-4">
+            <CardTitle className="text-xl font-extrabold uppercase">{event.title}</CardTitle>
+            <CardDescription className="font-semibold text-black">
+                by {event.organizer.name}
+            </CardDescription>
+        </CardHeader>
+        <CardContent className="p-4">
+            <p className="mb-4 text-gray-700 font-medium h-20 overflow-hidden">{event.description}</p>
+            <div className="flex flex-col space-y-2 text-sm">
+                <div className="flex items-center gap-2 font-semibold"><Calendar className="w-4 h-4" /> {new Date(event.date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</div>
+                <div className="flex items-center gap-2 font-semibold"><MapPin className="w-4 h-4" /> {event.location}</div>
+            </div>
+            <div className="mt-4 flex justify-between items-center">
+                {event.organizerId === session?.user.id ? (
+                  <form action={onCancel}><input type="hidden" name="eventId" value={event.id} /><Button type="submit" variant="destructive" className="border-2 border-black font-bold shadow-[2px_2px_0_0_#000]">Cancel Event</Button></form>
+                ) : isRegistered ? (
+                  <Badge className="font-bold border-2 border-black shadow-[2px_2px_0_0_#000]">Registered</Badge>
+                ) : (
+                  <form action={onRegister}><input type="hidden" name="eventId" value={event.id} /><Button type="submit" className="bg-transparent border-2 border-black text-black font-bold hover:bg-black hover:text-white transition-all">Register</Button></form>
+                )}
+                <Link href={`/events/${event.id}`}><Button variant="secondary" className="bg-transparent border-2 border-black text-black font-bold hover:bg-black hover:text-white transition-all">View Details</Button></Link>
+            </div>
+        </CardContent>
+    </Card>
+);
+
 export default function EventsPage({
   searchParams,
 }: {
@@ -94,7 +126,7 @@ export default function EventsPage({
         if (session) {
           const myEventsResult = await getEventsByOrganizer(session.user.id);
           if (myEventsResult.success) {
-            setMyEvents(myEventsResult.data);
+            setMyEvents(myEventsResult.data || null);
           }
           const registered = await getRegisteredEventIds(session.user.id);
           setRegisteredIds(registered);
@@ -114,19 +146,15 @@ export default function EventsPage({
       router.push("/register");
       return;
     }
-    const eventId = formData.get("eventId") as string;
-    if (session?.user?.id) {
-      await registerForEvent(session.user.id, eventId);
-      const updatedRegisteredIds = await getRegisteredEventIds(
-        session.user.id
-      );
-      setRegisteredIds(updatedRegisteredIds);
-    }
+    await registerForEvent(formData);
+    const updatedRegisteredIds = await getRegisteredEventIds(
+      session.user.id
+    );
+    setRegisteredIds(updatedRegisteredIds);
   }
 
   async function handleCancel(formData: FormData) {
-    const eventId = formData.get("eventId") as string;
-    await cancelEvent(eventId);
+    await cancelEvent(formData);
     const updatedEvents = await getEvents();
     if (updatedEvents.success) {
       setEvents(updatedEvents.data || []);
@@ -134,7 +162,7 @@ export default function EventsPage({
     if (session?.user?.id) {
       const myEventsResult = await getEventsByOrganizer(session.user.id);
       if (myEventsResult.success) {
-        setMyEvents(myEventsResult.data);
+        setMyEvents(myEventsResult.data || null);
       }
     }
   }
@@ -252,290 +280,69 @@ export default function EventsPage({
       </nav>
 
       <PageTransition>
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-          {/* Header */}
-          <div className="flex items-center justify-between mb-6">
-            <h1 className="text-3xl font-bold">Events</h1>
-            <Link
-              href="/events/create"
-              className="inline-flex items-center px-4 py-2 bg-[#A63D00] text-white rounded hover:bg-[#A63D00]/90 text-sm font-semibold"
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              Create Event
-            </Link>
-          </div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <header className="text-left mb-12">
+            <h1 className="text-4xl font-extrabold text-black uppercase mb-2">
+              Connect & Grow: Tech Events
+            </h1>
+            <p className="text-lg text-gray-700 font-semibold">
+              Join our community for workshops, hackathons, and talks.
+            </p>
+          </header>
 
-          {/* Search */}
-          <div className="mb-8">
-            <form className="relative" method="get" action="/events">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-              <Input
-                name="q"
-                defaultValue={searchQuery}
-                placeholder="Search events..."
-                className="pl-10"
-              />
-            </form>
-          </div>
+          <Card className="border-4 border-black rounded-lg shadow-[8px_8px_0px_0px_#000] bg-white p-6 mb-8">
+            <div className="grid md:grid-cols-4 gap-4 items-center">
+              <div className="md:col-span-3">
+                  <Input placeholder="Search events..." className="border-2 border-black font-semibold" />
+              </div>
+              <Button asChild className="w-full bg-transparent border-2 border-black text-black font-bold hover:bg-black hover:text-white transition-all">
+                <Link href="/events/create"><Plus className="w-4 h-4 mr-2" />Create Event</Link>
+              </Button>
+            </div>
+          </Card>
 
-          {/* Event Tabs */}
-          <Tabs defaultValue="upcoming" className="space-y-8">
-            <TabsList className="grid w-full grid-cols-4 bg-white border border-[#A63D00]/20">
+          <Tabs defaultValue="upcoming" className="w-full">
+            <TabsList className="grid w-full grid-cols-3 bg-white p-2 rounded-lg border-2 border-black shadow-[4px_4px_0_0_#000]">
               <TabsTrigger
                 value="upcoming"
-                className="data-[state=active]:bg-[#A63D00] data-[state=active]:text-white"
+                className="data-[state=active]:bg-black data-[state=active]:text-white rounded-md"
               >
-                Upcoming
+                Upcoming Events
               </TabsTrigger>
               <TabsTrigger
                 value="past"
-                className="data-[state=active]:bg-[#A63D00] data-[state=active]:text-white"
+                className="data-[state=active]:bg-black data-[state=active]:text-white rounded-md"
               >
-                Past
+                Past Events
               </TabsTrigger>
-              <TabsTrigger
-                value="my-events"
-                className="data-[state=active]:bg-[#A63D00] data-[state=active]:text-white"
-              >
-                My Events
-              </TabsTrigger>
-              <TabsTrigger
-                value="registered"
-                className="data-[state=active]:bg-[#A63D00] data-[state=active]:text-white"
-              >
-                Registered
-              </TabsTrigger>
+              {session && (
+                <TabsTrigger
+                  value="my-events"
+                  className="data-[state=active]:bg-black data-[state=active]:text-white rounded-md"
+                >
+                  My Events
+                </TabsTrigger>
+              )}
             </TabsList>
-
-            {/* Upcoming Events */}
-            <TabsContent value="upcoming" className="space-y-6">
-              <div className="grid grid-cols-1 gap-4">
-                {error && <p className="text-red-500">Could not fetch events.</p>}
-                {upcomingEvents.length === 0 ? (
-                  <p className="text-gray-600">No upcoming events found.</p>
-                ) : (
-                  upcomingEvents.map((event) => (
-                    <div
-                      key={event.id}
-                      className="border-2 border-black p-6 rounded-md bg-[#FFF8E1] hover:shadow-xl transition-all"
-                    >
-                      <div className="flex justify-between items-center mb-2">
-                        <h2 className="text-xl font-bold text-[#232323]">{event.title}</h2>
-                        <span className="text-sm text-gray-700">
-                          {event.date.toLocaleDateString()}
-                        </span>
-                      </div>
-                      <p className="text-[#232323] mb-2">{event.description}</p>
-                      <div className="flex items-center space-x-4 text-sm text-gray-700">
-                        <span className="flex items-center">
-                          <MapPin className="h-4 w-4 mr-1" /> {event.location}
-                        </span>
-                        <span className="flex items-center">
-                          <Users className="h-4 w-4 mr-1" /> {event.organizer.name}
-                        </span>
-                      </div>
-                      <div className="mt-4">
-                        {session && event.organizerId === session.user.id ? (
-                          <Link href={`/events/${event.id}`} className="w-full">
-                            <Button
-                              variant="outline"
-                              disabled
-                              className="w-full border-[#A63D00] text-[#A63D00]/70 cursor-not-allowed"
-                            >
-                              Your Event
-                            </Button>
-                          </Link>
-                        ) : session && registeredIds.includes(event.id) ? (
-                          <Link href={`/events/${event.id}`} className="w-full">
-                            <Button
-                              variant="outline"
-                              disabled
-                              className="w-full border-[#A63D00] text-[#A63D00]/70 cursor-not-allowed"
-                            >
-                              Registered
-                            </Button>
-                          </Link>
-                        ) : session ? (
-                          <form action={handleRegister} className="w-full">
-                            <input
-                              type="hidden"
-                              name="eventId"
-                              value={event.id}
-                            />
-                            <Button
-                              type="submit"
-                              className="w-full bg-[#A63D00] hover:bg-[#A63D00]/90"
-                            >
-                              Register Now
-                            </Button>
-                          </form>
-                        ) : (
-                          <Link href="/register" className="w-full">
-                            <Button className="w-full bg-[#A63D00] hover:bg-[#A63D00]/90">
-                              Register Now
-                            </Button>
-                          </Link>
-                        )}
-                      </div>
-                    </div>
-                  ))
-                )}
+            <TabsContent value="upcoming">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-8">
+                {upcomingEvents.map((event, index) => <EventCard key={event.id} event={event} isRegistered={registeredIds.includes(event.id)} onRegister={handleRegister} onCancel={handleCancel} session={session} color={BRUTALIST_COLORS[index % BRUTALIST_COLORS.length]} />)}
               </div>
             </TabsContent>
-
-            {/* Past Events */}
-            <TabsContent value="past" className="space-y-6">
-              <div className="grid grid-cols-1 gap-4">
-                {pastEvents.length === 0 ? (
-                  <p className="text-gray-600">No past events found.</p>
-                ) : (
-                  pastEvents.map((event) => (
-                    <div
-                      key={event.id}
-                      className="border-2 border-black p-6 rounded-md bg-[#FFF8E1] hover:shadow-xl transition-all"
-                    >
-                      <div className="flex justify-between items-center mb-2">
-                        <h2 className="text-xl font-bold text-[#232323]">{event.title}</h2>
-                        <span className="text-sm text-gray-700">
-                          {event.date.toLocaleDateString()}
-                        </span>
-                      </div>
-                      <p className="text-[#232323] mb-2">{event.description}</p>
-                      <div className="flex items-center space-x-4 text-sm text-gray-700">
-                        <span className="flex items-center">
-                          <MapPin className="h-4 w-4 mr-1" /> {event.location}
-                        </span>
-                        <span className="flex items-center">
-                          <Users className="h-4 w-4 mr-1" /> {event.organizer.name}
-                        </span>
-                      </div>
-                      <div className="mt-4">
-                        <Link href={`/events/${event.id}`} className="w-full">
-                          <Button
-                            variant="outline"
-                            className="w-full border-[#A63D00] text-[#A63D00] hover:bg-[#A63D00]/10"
-                          >
-                            View Details
-                          </Button>
-                        </Link>
-                      </div>
-                    </div>
-                  ))
-                )}
+            <TabsContent value="past">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-8">
+                {pastEvents.map((event, index) => <EventCard key={event.id} event={event} isRegistered={registeredIds.includes(event.id)} onRegister={handleRegister} onCancel={handleCancel} session={session} color={BRUTALIST_COLORS[index % BRUTALIST_COLORS.length]} />)}
               </div>
             </TabsContent>
-
-            {/* My Events */}
-            <TabsContent value="my-events" className="space-y-6">
-              {session ? (
-                <div className="grid grid-cols-1 gap-4">
-                  {myEvents && myEvents.length > 0 ? (
-                    myEvents.map((event) => (
-                      <div
-                        key={event.id}
-                        className="border-2 border-black p-6 rounded-md bg-[#FFF8E1] hover:shadow-xl transition-all"
-                      >
-                        <div className="flex justify-between items-center mb-2">
-                          <h2 className="text-xl font-bold text-[#232323]">{event.title}</h2>
-                          <span className="text-sm text-gray-700">
-                            {event.date.toLocaleDateString()}
-                          </span>
-                        </div>
-                        <p className="text-[#232323] mb-2">{event.description}</p>
-                        <div className="flex items-center space-x-4 text-sm text-gray-700">
-                          <span className="flex items-center">
-                            <MapPin className="h-4 w-4 mr-1" /> {event.location}
-                          </span>
-                        </div>
-                        <div className="mt-4 flex space-x-2">
-                          <Link href={`/events/${event.id}`} className="flex-1">
-                            <Button
-                              variant="outline"
-                              className="w-full border-[#A63D00] text-[#A63D00] hover:bg-[#A63D00]/10"
-                            >
-                              View Details
-                            </Button>
-                          </Link>
-                          <form action={handleCancel} className="flex-1">
-                            <input
-                              type="hidden"
-                              name="eventId"
-                              value={event.id}
-                            />
-                            <Button variant="destructive" className="w-full">
-                              Cancel
-                            </Button>
-                          </form>
-                        </div>
-                      </div>
-                    ))
-                  ) : (
-                    <p className="text-gray-600">You haven't organized any events yet.</p>
-                  )}
+            {session && (
+              <TabsContent value="my-events">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-8">
+                  {myEvents?.map((event, index) => <EventCard key={event.id} event={event} isRegistered={registeredIds.includes(event.id)} onRegister={handleRegister} onCancel={handleCancel} session={session} color={BRUTALIST_COLORS[index % BRUTALIST_COLORS.length]} />)}
                 </div>
-              ) : (
-                <p className="text-gray-600">Please log in to view your events.</p>
-              )}
-            </TabsContent>
-
-            {/* Registered Events */}
-            <TabsContent value="registered" className="space-y-6">
-              {session ? (
-                <div className="grid grid-cols-1 gap-4">
-                  {events.filter(e => registeredIds.includes(e.id)).length > 0 ? (
-                    events
-                      .filter(e => registeredIds.includes(e.id))
-                      .map((event) => (
-                        <div
-                          key={event.id}
-                          className="border-2 border-black p-6 rounded-md bg-[#FFF8E1] hover:shadow-xl transition-all"
-                        >
-                          <div className="flex justify-between items-center mb-2">
-                            <h2 className="text-xl font-bold text-[#232323]">{event.title}</h2>
-                            <span className="text-sm text-gray-700">
-                              {event.date.toLocaleDateString()}
-                            </span>
-                          </div>
-                          <p className="text-[#232323] mb-2">{event.description}</p>
-                          <div className="flex items-center space-x-4 text-sm text-gray-700">
-                            <span className="flex items-center">
-                              <MapPin className="h-4 w-4 mr-1" /> {event.location}
-                            </span>
-                            <span className="flex items-center">
-                              <Users className="h-4 w-4 mr-1" /> {event.organizer.name}
-                            </span>
-                          </div>
-                          <div className="mt-4">
-                            {event.date < now ? (
-                              <Button
-                                variant="outline"
-                                disabled
-                                className="w-full border-[#A63D00] text-[#A63D00]/70 cursor-not-allowed"
-                              >
-                                Ended
-                              </Button>
-                            ) : (
-                              <Link href={`/events/${event.id}`} className="w-full">
-                                <Button
-                                  variant="outline"
-                                  className="w-full border-[#A63D00] text-[#A63D00] hover:bg-[#A63D00]/10"
-                                >
-                                  View Details
-                                </Button>
-                              </Link>
-                            )}
-                          </div>
-                        </div>
-                      ))
-                  ) : (
-                    <p className="text-gray-600">You haven't registered for any events yet.</p>
-                  )}
-                </div>
-              ) : (
-                <p className="text-gray-600">Please log in to view your registrations.</p>
-              )}
-            </TabsContent>
+              </TabsContent>
+            )}
           </Tabs>
+
         </div>
       </PageTransition>
     </div>

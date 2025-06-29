@@ -20,6 +20,7 @@ import {
   Clock,
   LogOut,
   Megaphone,
+  X,
 } from "lucide-react";
 import { useSession, signOut } from "@/app/lib/auth-client";
 import { useRouter } from "next/navigation";
@@ -27,6 +28,12 @@ import { useEffect } from "react";
 import { useMentorProblems } from "@/app/lib/use-mentor-problems";
 import { CreateAnnouncementModal } from "@/components/create-announcement-modal";
 import Link from "next/link";
+import { toast } from "sonner";
+import { Input } from "@/components/ui/input";
+
+const BRUTALIST_COLORS = [
+  '#FFF8E1', '#FFD580', '#FDE1BC', '#FFB800', '#F96D3A', '#FFEDC2'
+];
 
 export default function MentorDashboardPage() {
   const { data: session, isPending } = useSession();
@@ -38,6 +45,48 @@ export default function MentorDashboardPage() {
     assignMentorToProblem,
   } = useMentorProblems();
   const [isAnnModalOpen, setIsAnnModalOpen] = React.useState(false);
+  const [skills, setSkills] = React.useState<string[]>([]);
+  const [skillInput, setSkillInput] = React.useState("");
+  const [isUpdatingSkills, setIsUpdatingSkills] = React.useState(false);
+
+  React.useEffect(() => {
+    if (session?.user) {
+      setSkills((session.user as any).skills || []);
+    }
+  }, [session]);
+
+  const handleAddSkill = async () => {
+    if (skillInput.trim() && !skills.includes(skillInput.trim())) {
+      const newSkills = [...skills, skillInput.trim()];
+      await updateSkills(newSkills);
+      setSkillInput("");
+    }
+  };
+
+  const handleRemoveSkill = async (skillToRemove: string) => {
+    const newSkills = skills.filter((skill) => skill !== skillToRemove);
+    await updateSkills(newSkills);
+  };
+
+  const updateSkills = async (newSkills: string[]) => {
+    setIsUpdatingSkills(true);
+    try {
+      const response = await fetch('/api/mentors', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ skills: newSkills }),
+      });
+      if (!response.ok) {
+        throw new Error('Failed to update skills');
+      }
+      setSkills(newSkills);
+      toast.success("Skills updated successfully!");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "An unknown error occurred.");
+    } finally {
+      setIsUpdatingSkills(false);
+    }
+  };
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -118,6 +167,13 @@ export default function MentorDashboardPage() {
     return null;
   }
 
+  const statsCards = [
+    { title: 'Active Students', value: stats.uniqueStudents, icon: Users, description: 'Students with problems' },
+    { title: 'Open Problems', value: stats.openProblems, icon: MessageSquare, description: 'Awaiting mentors' },
+    { title: 'My Mentoring', value: stats.myMentoredProblems, icon: Calendar, description: "Problems I'm helping with" },
+    { title: 'Resolved Problems', value: stats.resolvedProblems, icon: Star, description: 'Successfully solved' }
+  ];
+
   return (
     <div className="min-h-screen bg-[#FFE8CC]/20">
       {/* Navigation */}
@@ -176,360 +232,187 @@ export default function MentorDashboardPage() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+        <div className="text-left mb-12">
+          <h1 className="text-4xl font-extrabold text-black mb-2 uppercase">
             Welcome back, {session.user?.name || "Mentor"}!
           </h1>
-          <p className="text-gray-600">
+          <p className="text-lg text-gray-700 font-semibold">
             Here&apos;s an overview of your mentoring activities.
           </p>
         </div>
 
         {/* Quick Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <Card className="border-[#A63D00]/20 hover:scale-105 transition-transform duration-300 cursor-pointer">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                Active Students
-              </CardTitle>
-              <Users className="h-4 w-4 text-[#A63D00]" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-[#A63D00]">
-                {problemsLoading ? (
-                  <Loader2 className="h-6 w-6 animate-spin" />
-                ) : (
-                  stats.uniqueStudents
-                )}
-              </div>
-              <p className="text-xs text-gray-600">Students with problems</p>
-            </CardContent>
-          </Card>
-
-          <Card className="border-[#A63D00]/20 hover:scale-105 transition-transform duration-300 cursor-pointer">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                Open Problems
-              </CardTitle>
-              <MessageSquare className="h-4 w-4 text-[#A63D00]" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-[#A63D00]">
-                {problemsLoading ? (
-                  <Loader2 className="h-6 w-6 animate-spin" />
-                ) : (
-                  stats.openProblems
-                )}
-              </div>
-              <p className="text-xs text-gray-600">Awaiting mentors</p>
-            </CardContent>
-          </Card>
-
-          <Card className="border-[#A63D00]/20 hover:scale-105 transition-transform duration-300 cursor-pointer">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                My Mentoring
-              </CardTitle>
-              <Calendar className="h-4 w-4 text-[#A63D00]" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-[#A63D00]">
-                {problemsLoading ? (
-                  <Loader2 className="h-6 w-6 animate-spin" />
-                ) : (
-                  stats.myMentoredProblems
-                )}
-              </div>
-              <p className="text-xs text-gray-600">Problems I'm helping with</p>
-            </CardContent>
-          </Card>
-
-          <Card className="border-[#A63D00]/20 hover:scale-105 transition-transform duration-300 cursor-pointer">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                Resolved Problems
-              </CardTitle>
-              <Star className="h-4 w-4 text-[#A63D00]" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-[#A63D00]">
-                {problemsLoading ? (
-                  <Loader2 className="h-6 w-6 animate-spin" />
-                ) : (
-                  stats.resolvedProblems
-                )}
-              </div>
-              <p className="text-xs text-gray-600">Successfully solved</p>
-            </CardContent>
-          </Card>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+            {statsCards.map((stat, index) => (
+                <Card key={index} className="border-4 border-black rounded-lg shadow-[8px_8px_0px_0px_#000] transition-all duration-300 hover:shadow-[12px_12px_0px_0px_#000]" style={{ backgroundColor: BRUTALIST_COLORS[index % BRUTALIST_COLORS.length] }}>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-sm font-bold uppercase">{stat.title}</CardTitle>
+                        <stat.icon className="h-6 w-6 text-black" />
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-3xl font-extrabold text-black">
+                            {problemsLoading ? <Loader2 className="h-8 w-8 animate-spin" /> : stat.value}
+                        </div>
+                        <p className="text-xs text-black font-semibold">{stat.description}</p>
+                    </CardContent>
+                </Card>
+            ))}
         </div>
 
         {/* Main Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Recent Student Queries */}
-          <div className="lg:col-span-2">
-            <Card className="border-[#A63D00]/20">
-              <CardHeader>
-                <div className="flex justify-between items-center">
-                  <CardTitle className="text-xl">
-                    My Assigned Problems
-                  </CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Problem Lists */}
+          <div className="lg:col-span-2 space-y-8">
+            {/* My Assigned Problems */}
+            <div>
+              <h2 className="text-2xl font-extrabold text-black mb-4 uppercase">My Assigned Problems</h2>
+              <div className="space-y-6">
                 {problemsLoading ? (
-                  <div className="flex items-center justify-center py-8">
+                  <Card className="border-4 border-black rounded-lg shadow-[8px_8px_0px_0px_#000] p-6 bg-white flex items-center justify-center">
                     <Loader2 className="h-8 w-8 animate-spin text-[#A63D00]" />
-                    <span className="ml-2 text-gray-600">
-                      Loading problems...
-                    </span>
-                  </div>
+                    <span className="ml-2 text-gray-600 font-semibold">Loading problems...</span>
+                  </Card>
                 ) : myAssignedProblems.length === 0 ? (
-                  <div className="text-center py-8">
+                  <Card className="border-4 border-black rounded-lg shadow-[8px_8px_0px_0px_#000] p-6 bg-white text-center">
                     <MessageSquare className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                      No problems assigned to you yet.
-                    </h3>
-                    <p className="text-gray-600">
-                      When a student assigns you to a problem, or you take one, it will appear here.
-                    </p>
-                  </div>
+                    <h3 className="text-lg font-extrabold text-black mb-2">No problems assigned to you yet.</h3>
+                    <p className="text-gray-600 font-semibold">When you take a problem, it will appear here.</p>
+                  </Card>
                 ) : (
                   myAssignedProblems.map((problem) => (
-                    <div
-                      key={problem.id}
-                      className="border-l-4 pl-4 border-orange-500"
-                    >
+                    <Card key={problem.id} className="border-4 border-black rounded-lg shadow-[8px_8px_0px_0px_#A63D00] p-6" style={{ backgroundColor: '#FFF8E1' }}>
                       <div className="flex justify-between items-start mb-2">
                         <div className="flex-1">
-                          <h4 className="font-semibold">{problem.title}</h4>
-                          <p className="text-sm text-gray-600">
-                            {problem.description.length > 80
-                              ? `${problem.description.substring(0, 80)}...`
-                              : problem.description}
+                          <h4 className="font-bold text-xl uppercase">{problem.title}</h4>
+                          <p className="text-sm text-gray-700 mt-2">
+                            {problem.description.length > 100 ? `${problem.description.substring(0, 100)}...` : problem.description}
                           </p>
                           {problem.tags.length > 0 && (
-                            <div className="flex space-x-1 mt-2">
-                              {problem.tags.slice(0, 3).map((tag, index) => (
-                                <Badge
-                                  key={index}
-                                  variant="secondary"
-                                  className="text-xs"
-                                >
-                                  {tag}
-                                </Badge>
-                              ))}
+                            <div className="flex flex-wrap gap-2 mt-4">
+                              {problem.tags.map((tag, index) => ( <Badge key={index} variant="secondary" className="border-2 border-black font-bold">{tag}</Badge> ))}
                             </div>
                           )}
                         </div>
-                        {getStatusBadge(problem.status)}
+                        <div className="ml-4">{getStatusBadge(problem.status)}</div>
                       </div>
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-4 text-sm text-gray-500">
-                          <div className="flex items-center space-x-2">
-                            <Avatar className="h-5 w-5">
-                              <AvatarImage
-                                src={
-                                  problem.user.image ||
-                                  "/placeholder.svg?height=20&width=20"
-                                }
-                              />
-                              <AvatarFallback className="bg-[#A63D00] text-white text-xs">
-                                {problem.user.name?.charAt(0)?.toUpperCase() ||
-                                  "S"}
-                              </AvatarFallback>
-                            </Avatar>
-                            <span>{problem.user.name || "Student"}</span>
-                          </div>
+                      <div className="flex items-center justify-between mt-4">
+                        <div className="flex items-center space-x-2 text-sm text-gray-600 font-semibold">
+                          <Avatar className="h-6 w-6 border-2 border-black"><AvatarImage src={problem.user.image || ''} /><AvatarFallback>{problem.user.name?.charAt(0)}</AvatarFallback></Avatar>
+                          <span>{problem.user.name}</span>
+                          <span>&bull;</span>
                           <span>{getTimeAgo(problem.createdAt)}</span>
                         </div>
-                        <div className="flex space-x-2">
-                           <Button
-                              size="sm"
-                              className="bg-[#A63D00] hover:bg-[#A63D00]/90"
-                              asChild
-                            >
-                              <Link href={`/problems/${problem.id}`}>
-                                <MessageSquare className="h-3 w-3 mr-1" />
-                                Continue
-                              </Link>
-                            </Button>
-                        </div>
+                        <Button size="sm" className="bg-[#FDFCF8] text-black font-bold rounded-md px-4 py-2 border-2 border-black transition-transform duration-150 hover:scale-105 hover:shadow-[2px_2px_0_0_#000]" asChild>
+                          <Link href={`/problems/${problem.id}`}> <MessageSquare className="h-4 w-4 mr-2" />Continue</Link>
+                        </Button>
                       </div>
-                    </div>
+                    </Card>
                   ))
                 )}
-              </CardContent>
-            </Card>
+              </div>
+            </div>
 
-            <div className="lg:col-span-2 mt-6">
-            <Card className="border-[#A63D00]/20">
-              <CardHeader>
-                <div className="flex justify-between items-center">
-                  <CardTitle className="text-xl">
-                    Open Queries
-                  </CardTitle>
-                  <Button className="bg-[#A63D00] hover:bg-[#A63D00]/90">
-                    <Link href="/problems">
-                      <Eye className="h-4 w-4 mr-2" />
-                      View All Problems ({problems.length})
-                    </Link>
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
+            {/* Open Queries */}
+            <div>
+              <h2 className="text-2xl font-extrabold text-black mb-4 uppercase">Open Queries</h2>
+              <div className="space-y-6">
                 {problemsLoading ? (
-                  <div className="flex items-center justify-center py-8">
+                  <Card className="border-4 border-black rounded-lg shadow-[8px_8px_0px_0px_#000] p-6 bg-white flex items-center justify-center">
                     <Loader2 className="h-8 w-8 animate-spin text-[#A63D00]" />
-                    <span className="ml-2 text-gray-600">
-                      Loading problems...
-                    </span>
-                  </div>
+                    <span className="ml-2 text-gray-600 font-semibold">Loading problems...</span>
+                  </Card>
                 ) : openProblems.length === 0 ? (
-                  <div className="text-center py-8">
+                  <Card className="border-4 border-black rounded-lg shadow-[8px_8px_0px_0px_#000] p-6 bg-white text-center">
                     <MessageSquare className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                      No open student problems yet
-                    </h3>
-                    <p className="text-gray-600">
-                      When students post problems, they'll appear here for you
-                      to help with.
-                    </p>
-                  </div>
+                    <h3 className="text-lg font-extrabold text-black mb-2">No open student problems.</h3>
+                    <p className="text-gray-600 font-semibold">Check back later for new queries.</p>
+                  </Card>
                 ) : (
-                  openProblems.slice(0, 5).map((problem) => (
-                    <div
-                      key={problem.id}
-                      className="border-l-4 pl-4 border-blue-500"
-                    >
+                  openProblems.map((problem) => (
+                     <Card key={problem.id} className="border-4 border-black rounded-lg shadow-[8px_8px_0px_0px_#000] p-6 bg-white">
                       <div className="flex justify-between items-start mb-2">
                         <div className="flex-1">
-                          <h4 className="font-semibold">{problem.title}</h4>
-                          <p className="text-sm text-gray-600">
-                            {problem.description.length > 80
-                              ? `${problem.description.substring(0, 80)}...`
-                              : problem.description}
+                          <h4 className="font-bold text-xl uppercase">{problem.title}</h4>
+                          <p className="text-sm text-gray-700 mt-2">
+                            {problem.description.length > 100 ? `${problem.description.substring(0, 100)}...` : problem.description}
                           </p>
                           {problem.tags.length > 0 && (
-                            <div className="flex space-x-1 mt-2">
-                              {problem.tags.slice(0, 3).map((tag, index) => (
-                                <Badge
-                                  key={index}
-                                  variant="secondary"
-                                  className="text-xs"
-                                >
-                                  {tag}
-                                </Badge>
-                              ))}
+                            <div className="flex flex-wrap gap-2 mt-4">
+                              {problem.tags.map((tag, index) => ( <Badge key={index} variant="secondary" className="border-2 border-black font-bold">{tag}</Badge> ))}
                             </div>
                           )}
                         </div>
-                        {getStatusBadge(problem.status)}
+                        <div className="ml-4">{getStatusBadge(problem.status)}</div>
                       </div>
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-4 text-sm text-gray-500">
-                          <div className="flex items-center space-x-2">
-                            <Avatar className="h-5 w-5">
-                              <AvatarImage
-                                src={
-                                  problem.user.image ||
-                                  "/placeholder.svg?height=20&width=20"
-                                }
-                              />
-                              <AvatarFallback className="bg-[#A63D00] text-white text-xs">
-                                {problem.user.name?.charAt(0)?.toUpperCase() ||
-                                  "S"}
-                              </AvatarFallback>
-                            </Avatar>
-                            <span>{problem.user.name || "Student"}</span>
-                          </div>
+                      <div className="flex items-center justify-between mt-4">
+                        <div className="flex items-center space-x-2 text-sm text-gray-600 font-semibold">
+                           <Avatar className="h-6 w-6 border-2 border-black"><AvatarImage src={problem.user.image || ''} /><AvatarFallback>{problem.user.name?.charAt(0)}</AvatarFallback></Avatar>
+                           <span>{problem.user.name}</span>
+                           <span>&bull;</span>
                           <span>{getTimeAgo(problem.createdAt)}</span>
                         </div>
-                        <div className="flex space-x-2">
-                          <Button
-                            size="sm"
-                            className="bg-[#A63D00] hover:bg-[#A63D00]/90"
-                            onClick={() => handleAssignToMe(problem.id)}
-                          >
-                            <Plus className="h-3 w-3 mr-1" />
-                            Take This
-                          </Button>
-                        </div>
+                        <Button size="sm" className="bg-[#FDFCF8] text-black font-bold rounded-md px-4 py-2 border-2 border-black transition-transform duration-150 hover:scale-105 hover:shadow-[2px_2px_0_0_#000]" onClick={() => handleAssignToMe(problem.id)}>
+                          <Plus className="h-4 w-4 mr-2" />Take This
+                        </Button>
                       </div>
-                    </div>
+                    </Card>
                   ))
                 )}
-              </CardContent>
-            </Card>
+              </div>
             </div>
           </div>
 
           {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Performance Overview */}
-            <Card className="border-[#A63D00]/20">
+          <div className="space-y-8">
+            <Card className="border-4 border-black rounded-lg shadow-[8px_8px_0px_0px_#000]" style={{ backgroundColor: BRUTALIST_COLORS[1] }}>
               <CardHeader>
-                <CardTitle className="text-lg">Performance Overview</CardTitle>
+                <CardTitle className="text-lg font-extrabold uppercase">Performance Overview</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm">Total Problems</span>
-                  <span className="text-sm font-bold text-[#A63D00]">
-                    {problemsLoading ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      stats.totalProblems
-                    )}
-                  </span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm">Resolution Rate</span>
-                  <span className="text-sm font-bold text-[#A63D00]">
-                    {problemsLoading ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : stats.totalProblems > 0 ? (
-                      `${Math.round(
-                        (stats.resolvedProblems / stats.totalProblems) * 100
-                      )}%`
-                    ) : (
-                      "0%"
-                    )}
-                  </span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm">In Progress</span>
-                  <span className="text-sm font-bold text-[#A63D00]">
-                    {problemsLoading ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      stats.inProgressProblems
-                    )}
-                  </span>
-                </div>
-                <Button className="w-full bg-[#A63D00] hover:bg-[#A63D00]/90">
-                  <BarChart3 className="h-4 w-4 mr-2" />
-                  View Detailed Stats
+                <div className="flex justify-between items-center font-semibold"><span className="text-sm">Total Problems</span><span className="text-sm font-bold text-black">{problemsLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : stats.totalProblems}</span></div>
+                <div className="flex justify-between items-center font-semibold"><span className="text-sm">Resolution Rate</span><span className="text-sm font-bold text-black">{problemsLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : stats.totalProblems > 0 ? `${Math.round((stats.resolvedProblems / stats.totalProblems) * 100)}%` : "0%"}</span></div>
+                <div className="flex justify-between items-center font-semibold"><span className="text-sm">In Progress</span><span className="text-sm font-bold text-black">{problemsLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : stats.inProgressProblems}</span></div>
+                <Button className="w-full bg-transparent border-2 border-black text-black font-bold hover:bg-black hover:text-white transition-all">
+                  <BarChart3 className="h-4 w-4 mr-2" />View Detailed Stats
                 </Button>
               </CardContent>
             </Card>
 
-            {/* Quick Actions */}
-            <Card className="border-[#A63D00]/20">
+            <Card className="border-4 border-black rounded-lg shadow-[8px_8px_0px_0px_#000]" style={{ backgroundColor: BRUTALIST_COLORS[2] }}>
               <CardHeader>
-                <CardTitle className="text-lg">Quick Actions</CardTitle>
+                <CardTitle className="text-lg font-extrabold uppercase">My Skills</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {skills.map((skill, index) => (
+                    <Badge key={index} variant="secondary" className="flex items-center gap-1 border-2 border-black font-bold">
+                      {skill}
+                      <button onClick={() => handleRemoveSkill(skill)} className="hover:text-red-500"><X className="w-3 h-3"/></button>
+                    </Badge>
+                  ))}
+                </div>
+                <div className="flex gap-2">
+                  <Input value={skillInput} onChange={(e) => setSkillInput(e.target.value)} placeholder="Add a new skill..." className="border-2 border-black" />
+                  <Button onClick={handleAddSkill} disabled={isUpdatingSkills} className="bg-transparent border-2 border-black text-black font-bold hover:bg-black hover:text-white transition-all">
+                    {isUpdatingSkills ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Add'}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-4 border-black rounded-lg shadow-[8px_8px_0px_0px_#000]" style={{ backgroundColor: BRUTALIST_COLORS[4] }}>
+              <CardHeader>
+                <CardTitle className="text-lg font-extrabold uppercase">Quick Actions</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                <Button className="w-full justify-start bg-white border border-[#A63D00] text-[#A63D00] hover:bg-[#A63D00] hover:text-white">
-                  <BookOpen className="h-4 w-4 mr-2" />
-                  Create Knowledge Article
+                <Button className="w-full justify-center bg-transparent border-2 border-black text-black font-bold hover:bg-black hover:text-white transition-all">
+                  <BookOpen className="h-4 w-4 mr-2" />Create Knowledge Article
                 </Button>
-                <Button className="w-full justify-start bg-white border border-[#A63D00] text-[#A63D00] hover:bg-[#A63D00] hover:text-white">
-                  <Calendar className="h-4 w-4 mr-2" />
-                  Schedule Office Hours
+                <Button className="w-full justify-center bg-transparent border-2 border-black text-black font-bold hover:bg-black hover:text-white transition-all">
+                  <Calendar className="h-4 w-4 mr-2" />Schedule Office Hours
                 </Button>
-                <Button className="w-full justify-start bg-white border border-[#A63D00] text-[#A63D00] hover:bg-[#A63D00] hover:text-white">
-                  <Users className="h-4 w-4 mr-2" />
-                  Manage Students
+                <Button className="w-full justify-center bg-transparent border-2 border-black text-black font-bold hover:bg-black hover:text-white transition-all">
+                  <Users className="h-4 w-4 mr-2" />Manage Students
                 </Button>
               </CardContent>
             </Card>

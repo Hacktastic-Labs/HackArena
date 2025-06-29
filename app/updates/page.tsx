@@ -203,14 +203,14 @@ export default function UpdatesPage() {
                       setIsRefreshing(false);
                     }
                   }}
-                  className="border-[#A63D00] text-[#A63D00] bg-transparent"
+                  className="bg-[#FFB74D] border-2 border-[#A63D00] rounded-none shadow-[4px_4px_0px_#000] text-black hover:bg-[#A63D00] hover:text-white"
                 >
                   {isRefreshing ? "Refreshing..." : "Refresh Tech News"}
                 </Button>
               )}
               <Button
                 variant="outline"
-                className="border-[#A63D00] text-[#A63D00] bg-transparent"
+                className="bg-[#FFB74D] border-2 border-[#A63D00] rounded-none shadow-[4px_4px_0px_#000] text-black hover:bg-[#A63D00] hover:text-white"
               >
                 Mark All Read
               </Button>
@@ -218,10 +218,12 @@ export default function UpdatesPage() {
           </div>
 
           <div className="space-y-4">
-            {announcements.map((a) => (
+            {announcements.map((a, i) => (
               <Card
                 key={a.id}
-                className="border-[#A63D00]/20 border-l-4 border-l-[#A63D00] hover:bg-gray-50 cursor-pointer"
+                className={`${
+                  i % 2 === 0 ? "bg-[#FFF8E1]" : "bg-[#FFE8CC]"
+                } border-2 border-[#A63D00] rounded-none shadow-[4px_4px_0px_#000] cursor-pointer`}
                 onClick={() => a.url && window.open(a.url, "_blank")}
               >
                 <CardHeader>
