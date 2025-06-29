@@ -34,10 +34,30 @@ import {
   registerForEvent,
   cancelEvent,
 } from "./actions";
-import { auth } from "../lib/auth";
 import PageTransition from "@/components/PageTransition";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { signOut } from "next-auth/react";
+import { signOut, useSession } from "@/app/lib/auth-client";
+
+interface Event {
+  id: string;
+  title: string;
+  description: string | null;
+  date: Date;
+  location: string;
+  organizerId: string;
+  organizer: {
+    name: string | null;
+    username: string | null;
+    id: string;
+    createdAt: Date;
+    updatedAt: Date;
+    email: string;
+    emailVerified: boolean;
+    image: string | null;
+    skills: string[];
+    role: any;
+  };
+}
 
 export default function EventsPage({
   searchParams,
@@ -47,42 +67,39 @@ export default function EventsPage({
   const router = useRouter();
   const pathname = usePathname();
 
-  const [events, setEvents] = useState([]);
-  const [error, setError] = useState(null);
-  const [session, setSession] = useState(null);
-  const [myEvents, setMyEvents] = useState(null);
-  const [registeredIds, setRegisteredIds] = useState([]);
+  const [events, setEvents] = useState<Event[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const {data: session} = useSession();
+  const [myEvents, setMyEvents] = useState<Event[] | null>(null);
+  const [registeredIds, setRegisteredIds] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   const rawQ = searchParams?.q ?? "";
-  const searchQuery = (Array.isArray(rawQ) ? rawQ[0] : rawQ || "";
+  const searchQuery = (Array.isArray(rawQ) ? rawQ[0] : rawQ) || "";
 
   const now = new Date();
-  const upcomingEvents = events.filter(ev => new Date(ev.date) >= now);
-  const pastEvents = events.filter(ev => new Date(ev.date) < now);
+  const upcomingEvents = events.filter((ev) => ev.date >= now);
+  const pastEvents = events.filter((ev) => ev.date < now);
 
   useEffect(() => {
     async function loadData() {
       try {
         const response = await getEvents();
         if (response.error) {
-          setError(response.error);
+          setError(response.error as string);
         } else {
           setEvents(response.data || []);
         }
 
-        const authResponse = await auth.api.getSession();
-        setSession(authResponse);
-
-        if (authResponse) {
-          const myEventsResult = await getEventsByOrganizer(authResponse.user.id);
+        if (session) {
+          const myEventsResult = await getEventsByOrganizer(session.user.id);
           if (myEventsResult.success) {
             setMyEvents(myEventsResult.data);
           }
-          const registered = await getRegisteredEventIds(authResponse.user.id);
+          const registered = await getRegisteredEventIds(session.user.id);
           setRegisteredIds(registered);
         }
-      } catch (err) {
+      } catch (err: any) {
         setError(err.message);
       } finally {
         setIsLoading(false);
@@ -90,26 +107,36 @@ export default function EventsPage({
     }
 
     loadData();
-  }, []);
+  }, [session]);
 
   async function handleRegister(formData: FormData) {
     if (!session) {
       router.push("/register");
       return;
     }
-    const eventId = formData.get("eventId");
-    await registerForEvent(session.user.id, eventId);
-    const updatedRegisteredIds = await getRegisteredEventIds(session.user.id);
-    setRegisteredIds(updatedRegisteredIds);
+    const eventId = formData.get("eventId") as string;
+    if (session?.user?.id) {
+      await registerForEvent(session.user.id, eventId);
+      const updatedRegisteredIds = await getRegisteredEventIds(
+        session.user.id
+      );
+      setRegisteredIds(updatedRegisteredIds);
+    }
   }
 
   async function handleCancel(formData: FormData) {
-    const eventId = formData.get("eventId");
+    const eventId = formData.get("eventId") as string;
     await cancelEvent(eventId);
     const updatedEvents = await getEvents();
-    setEvents(updatedEvents.data || []);
-    const myEventsResult = await getEventsByOrganizer(session.user.id);
-    setMyEvents(myEventsResult.data);
+    if (updatedEvents.success) {
+      setEvents(updatedEvents.data || []);
+    }
+    if (session?.user?.id) {
+      const myEventsResult = await getEventsByOrganizer(session.user.id);
+      if (myEventsResult.success) {
+        setMyEvents(myEventsResult.data);
+      }
+    }
   }
 
   if (isLoading) {
@@ -295,7 +322,7 @@ export default function EventsPage({
                       <div className="flex justify-between items-center mb-2">
                         <h2 className="text-xl font-bold text-[#232323]">{event.title}</h2>
                         <span className="text-sm text-gray-700">
-                          {new Date(event.date).toLocaleDateString()}
+                          {event.date.toLocaleDateString()}
                         </span>
                       </div>
                       <p className="text-[#232323] mb-2">{event.description}</p>
@@ -370,7 +397,7 @@ export default function EventsPage({
                       <div className="flex justify-between items-center mb-2">
                         <h2 className="text-xl font-bold text-[#232323]">{event.title}</h2>
                         <span className="text-sm text-gray-700">
-                          {new Date(event.date).toLocaleDateString()}
+                          {event.date.toLocaleDateString()}
                         </span>
                       </div>
                       <p className="text-[#232323] mb-2">{event.description}</p>
@@ -411,7 +438,7 @@ export default function EventsPage({
                         <div className="flex justify-between items-center mb-2">
                           <h2 className="text-xl font-bold text-[#232323]">{event.title}</h2>
                           <span className="text-sm text-gray-700">
-                            {new Date(event.date).toLocaleDateString()}
+                            {event.date.toLocaleDateString()}
                           </span>
                         </div>
                         <p className="text-[#232323] mb-2">{event.description}</p>
@@ -466,7 +493,7 @@ export default function EventsPage({
                           <div className="flex justify-between items-center mb-2">
                             <h2 className="text-xl font-bold text-[#232323]">{event.title}</h2>
                             <span className="text-sm text-gray-700">
-                              {new Date(event.date).toLocaleDateString()}
+                              {event.date.toLocaleDateString()}
                             </span>
                           </div>
                           <p className="text-[#232323] mb-2">{event.description}</p>
@@ -479,7 +506,7 @@ export default function EventsPage({
                             </span>
                           </div>
                           <div className="mt-4">
-                            {new Date(event.date) < now ? (
+                            {event.date < now ? (
                               <Button
                                 variant="outline"
                                 disabled

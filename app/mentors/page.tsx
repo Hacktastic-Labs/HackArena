@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Search, Filter, Star, MessageSquare, Video, Calendar, MapPin, Clock, Users, Award, Loader2 } from "lucide-react"
+import { Search, Filter, Star, MessageSquare, Video, Calendar, MapPin, Clock, Users, Award, Loader2, Bell, LogOut } from "lucide-react"
 import Link from "next/link"
 import { useRouter, usePathname } from "next/navigation"
 import { signOut, useSession } from "@/app/lib/auth-client"
