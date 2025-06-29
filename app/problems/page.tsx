@@ -28,6 +28,34 @@ const ACTIVITY_COLORS = [
   '#FFF3E0', // brightest (bottom)
 ];
 
+const PALETTE_BORDERS = [
+  '#A63D00', // burnt orange
+  '#FFB800', // yellow
+  '#F96D3A', // orange
+  '#232323', // black
+  '#FFD580', // light yellow
+  '#FF6F61', // coral
+  '#FFEDC2', // pale yellow
+];
+const PALETTE_INNER = [
+  '#FFB800', // yellow
+  '#A63D00', // burnt orange
+  '#232323', // black
+  '#F96D3A', // orange
+  '#FF6F61', // coral
+  '#FFD580', // light yellow
+  '#FFEDC2', // pale yellow
+];
+
+const DASHBOARD_COLORS = [
+  '#FDE1BC', // light orange
+  '#FFF8E1', // off-white
+  '#FFB800', // yellow
+  '#F96D3A', // orange
+  '#FFD580', // light yellow
+  '#FFEDC2', // pale yellow
+];
+
 export default function ProblemsPage() {
   const { data: session, isPending } = useSession();
   const router = useRouter();
@@ -227,42 +255,44 @@ export default function ProblemsPage() {
               </Card>
             ) : (
               problems.map((problem, idx) => {
-                // Determine status badge style
+                const cardColor = DASHBOARD_COLORS[idx % DASHBOARD_COLORS.length];
+                const borderColor = PALETTE_BORDERS[idx % PALETTE_BORDERS.length];
+                const innerColor = PALETTE_INNER[idx % PALETTE_INNER.length];
+                const highlightColor = 'rgba(255,255,255,0.7)';
                 let statusBadge;
                 if (problem.status === 'OPEN') {
                   statusBadge = (
-                    <span className="px-3 py-1 bg-[#FFE066] text-black border-2 border-black font-bold rounded-full text-xs">OPEN</span>
+                    <span className="px-3 py-1 bg-[#FDFCF8] text-black font-bold rounded-full text-xs border-2 border-black shadow-[3px_3px_0_0_#000] transition-transform duration-150 hover:scale-105 hover:shadow-[4px_4px_0_0_#000]" style={{ borderColor: 'black', borderStyle: 'solid' }}>OPEN</span>
                   );
                 } else {
                   statusBadge = (
-                    <span className="px-4 py-1 bg-white border-2 border-black text-[#A63D00] font-bold rounded-md text-base">{problem.status}</span>
+                    <span className="px-4 py-1 bg-[#FDFCF8] text-black font-bold rounded-md text-base border-2" style={{ borderColor: innerColor, borderStyle: 'solid' }}>{problem.status}</span>
                   );
                 }
                 return (
                   <div
                     key={problem.id}
-                    className={`relative group border-4 border-black rounded-xl mb-12 overflow-visible flex flex-col justify-between min-h-[220px] transition-transform duration-200 group-hover:scale-105 group-hover:shadow-lg`}
-                    style={{ backgroundColor: ACTIVITY_COLORS[idx] }}
+                    className={`relative group rounded-xl mb-10 overflow-visible flex flex-col justify-between min-h-[110px] px-12 py-6`}
+                    style={{ backgroundColor: cardColor, border: '4px solid #000', boxShadow: '8px 8px 0 0 #000' }}
                   >
-                    <div className="flex flex-col gap-2 p-8">
+                    {/* Vertical content layout */}
+                    <div className="flex flex-col gap-2 relative z-10">
                       <div className="text-2xl font-extrabold text-black uppercase tracking-wide text-left mb-1">{problem.title}</div>
-                      <div className="text-base text-[#232323] mb-2 text-left">{problem.description.length > 150 ? `${problem.description.substring(0, 150)}...` : problem.description}</div>
+                      <div className="text-base text-[#232323] mb-1 text-left">{problem.description.length > 150 ? `${problem.description.substring(0, 150)}...` : problem.description}</div>
                       {problem.tags.length > 0 && (
-                        <div className="flex items-center flex-wrap gap-2 mt-2">
+                        <div className="flex items-center flex-wrap gap-2 mt-1">
                           {problem.tags.map((tag, index) => (
-                            <span key={index} className="bg-white border-2 border-black text-black font-bold rounded-full px-3 py-1 text-xs">{tag}</span>
+                            <span key={index} className="bg-[#FDFCF8] text-black font-bold rounded-full px-3 py-1 text-xs border-2" style={{ borderColor: innerColor, borderStyle: 'solid' }}>{tag}</span>
                           ))}
                         </div>
                       )}
-                      <div className="flex items-center justify-between mt-6">
+                      <div className="flex items-center justify-between mt-4">
                         {statusBadge}
-                        <div className="text-sm text-gray-600 font-semibold">
-                          Created {new Date(problem.createdAt).toLocaleDateString()}
-                        </div>
+                        <div className="text-sm text-gray-600 font-semibold">Created {new Date(problem.createdAt).toLocaleDateString()}</div>
                         {problem.mentor ? (
-                          <button className="bg-black text-[#FFB74D] font-bold border-2 border-black rounded-md px-6 py-2">Chat</button>
+                          <button className="bg-[#FDFCF8] text-black font-bold rounded-md px-6 py-2 border-2 border-black transition-transform duration-150 hover:scale-105 hover:shadow-[2px_2px_0_0_#000]" style={{ borderColor: 'black', borderStyle: 'solid' }}>Chat</button>
                         ) : (
-                          <button className="bg-[#FFB74D] text-black font-bold border-2 border-black rounded-md px-6 py-2 transition-colors duration-200 hover:bg-[#FFA726]">Find Mentor</button>
+                          <button className="bg-[#FDFCF8] text-black font-bold rounded-md px-6 py-2 border-2 border-black transition-transform duration-150 hover:scale-105 hover:shadow-[2px_2px_0_0_#000]" style={{ borderColor: 'black', borderStyle: 'solid' }}>Find Mentor</button>
                         )}
                       </div>
                     </div>

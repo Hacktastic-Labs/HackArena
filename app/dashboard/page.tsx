@@ -281,9 +281,6 @@ export default function DashboardPage() {
             </Card>
           </div>
 
-          {/* Navigation Cards */}
-          {/* Removed navigation cards grid as per user request */}
-
           {/* Recent Activity */}
           <div className="mb-8">
             <h2 className="text-2xl font-bold text-gray-900 mb-6">Recent Activity</h2>

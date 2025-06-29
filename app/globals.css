@@ -164,13 +164,12 @@
 }
 
 @keyframes float {
-  0% { transform: translateY(0); }
-  50% { transform: translateY(-12px); }
-  100% { transform: translateY(0); }
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
 }
 
-.float-animate {
-  animation: float 3s ease-in-out infinite;
+.animate-float {
+  animation: float 1.8s ease-in-out infinite;
 }
 
 @keyframes float-reverse {
