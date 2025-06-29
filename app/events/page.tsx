@@ -281,66 +281,75 @@ export default function EventsPage({
 
       <PageTransition>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <header className="text-left mb-12">
-            <h1 className="text-4xl font-extrabold text-black uppercase mb-2">
+          <div className="flex justify-between items-center mb-6">
+            <h1 className="text-4xl font-extrabold uppercase">
               Connect & Grow: Tech Events
             </h1>
-            <p className="text-lg text-gray-700 font-semibold">
-              Join our community for workshops, hackathons, and talks.
-            </p>
-          </header>
-
-          <Card className="border-4 border-black rounded-lg shadow-[8px_8px_0px_0px_#000] bg-white p-6 mb-8">
-            <div className="grid md:grid-cols-4 gap-4 items-center">
-              <div className="md:col-span-3">
-                  <Input placeholder="Search events..." className="border-2 border-black font-semibold" />
+            <div className="flex items-center gap-4">
+              <div className="relative">
+                <Input
+                  placeholder="Search events..."
+                  className="w-64 border-2 border-black rounded-lg shadow-[4px_4px_0_0_#000] focus:shadow-[6px_6px_0_0_#000] transition-shadow"
+                />
+                <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
               </div>
-              <Button asChild className="w-full bg-transparent border-2 border-black text-black font-bold hover:bg-black hover:text-white transition-all">
-                <Link href="/events/create"><Plus className="w-4 h-4 mr-2" />Create Event</Link>
-              </Button>
+              <Link href="/events/create" legacyBehavior>
+                <Button className="font-bold border-2 border-black rounded-lg bg-yellow-400 text-black shadow-[4px_4px_0_0_#000] hover:bg-yellow-500 hover:shadow-[6px_6px_0_0_#000] transition-all">
+                  <Plus className="mr-2" />
+                  Create Event
+                </Button>
+              </Link>
             </div>
-          </Card>
+          </div>
 
-          <Tabs defaultValue="upcoming" className="w-full">
-            <TabsList className="grid w-full grid-cols-3 bg-white p-2 rounded-lg border-2 border-black shadow-[4px_4px_0_0_#000]">
+          <Tabs defaultValue="all-events" className="w-full">
+            <TabsList className="bg-transparent p-0 inline-flex gap-4 mb-4">
               <TabsTrigger
-                value="upcoming"
-                className="data-[state=active]:bg-black data-[state=active]:text-white rounded-md"
+                value="all-events"
+                className="bg-[#FFB74D] border-2 border-black rounded-lg shadow-[4px_4px_0_0_#000] px-6 py-2 text-black font-bold data-[state=active]:bg-black data-[state=active]:text-white transition-all"
               >
-                Upcoming Events
+                <BookOpen className="mr-2" />
+                All Events
               </TabsTrigger>
               <TabsTrigger
-                value="past"
-                className="data-[state=active]:bg-black data-[state=active]:text-white rounded-md"
+                value="my-events"
+                className="bg-[#FFB74D] border-2 border-black rounded-lg shadow-[4px_4px_0_0_#000] px-6 py-2 text-black font-bold data-[state=active]:bg-black data-[state=active]:text-white transition-all"
               >
-                Past Events
+                <Code className="mr-2" />
+                My Events
               </TabsTrigger>
-              {session && (
-                <TabsTrigger
-                  value="my-events"
-                  className="data-[state=active]:bg-black data-[state=active]:text-white rounded-md"
-                >
-                  My Events
-                </TabsTrigger>
-              )}
+              <TabsTrigger
+                value="hackathons"
+                className="bg-[#FFB74D] border-2 border-black rounded-lg shadow-[4px_4px_0_0_#000] px-6 py-2 text-black font-bold data-[state=active]:bg-black data-[state=active]:text-white transition-all"
+              >
+                <Video className="mr-2" />
+                Hackathons
+              </TabsTrigger>
+              <TabsTrigger
+                value="workshops"
+                className="bg-[#FFB74D] border-2 border-black rounded-lg shadow-[4px_4px_0_0_#000] px-6 py-2 text-black font-bold data-[state=active]:bg-black data-[state=active]:text-white transition-all"
+              >
+                <Users className="mr-2" />
+                Workshops
+              </TabsTrigger>
             </TabsList>
-            <TabsContent value="upcoming">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-8">
+
+            <TabsContent value="all-events">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {upcomingEvents.map((event, index) => <EventCard key={event.id} event={event} isRegistered={registeredIds.includes(event.id)} onRegister={handleRegister} onCancel={handleCancel} session={session} color={BRUTALIST_COLORS[index % BRUTALIST_COLORS.length]} />)}
               </div>
             </TabsContent>
-            <TabsContent value="past">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-8">
-                {pastEvents.map((event, index) => <EventCard key={event.id} event={event} isRegistered={registeredIds.includes(event.id)} onRegister={handleRegister} onCancel={handleCancel} session={session} color={BRUTALIST_COLORS[index % BRUTALIST_COLORS.length]} />)}
+            <TabsContent value="my-events">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {myEvents?.map((event, index) => <EventCard key={event.id} event={event} isRegistered={registeredIds.includes(event.id)} onRegister={handleRegister} onCancel={handleCancel} session={session} color={BRUTALIST_COLORS[index % BRUTALIST_COLORS.length]} />)}
               </div>
             </TabsContent>
-            {session && (
-              <TabsContent value="my-events">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-8">
-                  {myEvents?.map((event, index) => <EventCard key={event.id} event={event} isRegistered={registeredIds.includes(event.id)} onRegister={handleRegister} onCancel={handleCancel} session={session} color={BRUTALIST_COLORS[index % BRUTALIST_COLORS.length]} />)}
-                </div>
-              </TabsContent>
-            )}
+            <TabsContent value="hackathons">
+              {/* Hackathons content */}
+            </TabsContent>
+            <TabsContent value="workshops">
+              {/* Workshops content */}
+            </TabsContent>
           </Tabs>
 
         </div>
