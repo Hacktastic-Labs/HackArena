@@ -287,7 +287,6 @@ export default function DashboardPage() {
             ))}
           </div>
 
-          {/* Optional: Keep main's nav cards here if needed */}
 
           {/* Recent Activity */}
           <div className="mb-8">
