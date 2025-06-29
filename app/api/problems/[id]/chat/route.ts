@@ -7,11 +7,11 @@ const prisma = new PrismaClient();
 
 export async function GET(
   req: NextRequest,
-  context: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const problemId = context.params.id;
+  const { id: problemId } = await params;
   const session = await auth.api.getSession({
-    headers: await headers()
+    headers: await headers(),
   });
   if (!session) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
@@ -21,10 +21,7 @@ export async function GET(
     const conversation = await prisma.conversation.findFirst({
       where: {
         problemId: problemId,
-        OR: [
-          { studentId: session.user.id },
-          { mentorId: session.user.id },
-        ],
+        OR: [{ studentId: session.user.id }, { mentorId: session.user.id }],
       },
       include: {
         messages: {
@@ -60,11 +57,11 @@ export async function GET(
 
 export async function POST(
   req: NextRequest,
-  context: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const problemId = context.params.id;
+  const { id: problemId } = await params;
   const session = await auth.api.getSession({
-    headers: await headers()
+    headers: await headers(),
   });
   if (!session) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
@@ -78,31 +75,31 @@ export async function POST(
 
   try {
     let conversation = await prisma.conversation.findFirst({
-        where: {
-            problemId: problemId,
-            OR: [
-                { studentId: session.user.id },
-                { mentorId: session.user.id },
-            ],
-        },
+      where: {
+        problemId: problemId,
+        OR: [{ studentId: session.user.id }, { mentorId: session.user.id }],
+      },
     });
 
     if (!conversation) {
-        const problem = await prisma.problem.findUnique({
-            where: { id: problemId },
-        });
+      const problem = await prisma.problem.findUnique({
+        where: { id: problemId },
+      });
 
-        if (!problem || !problem.mentorId) {
-            return NextResponse.json({ error: "Problem or mentor not found" }, { status: 404 });
-        }
+      if (!problem || !problem.mentorId) {
+        return NextResponse.json(
+          { error: "Problem or mentor not found" },
+          { status: 404 }
+        );
+      }
 
-        conversation = await prisma.conversation.create({
-            data: {
-                problemId: problemId,
-                studentId: problem.userId,
-                mentorId: problem.mentorId,
-            }
-        })
+      conversation = await prisma.conversation.create({
+        data: {
+          problemId: problemId,
+          studentId: problem.userId,
+          mentorId: problem.mentorId,
+        },
+      });
     }
 
     const newMessage = await prisma.message.create({
@@ -130,4 +127,4 @@ export async function POST(
       { status: 500 }
     );
   }
-} 
+}

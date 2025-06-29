@@ -7,9 +7,9 @@ const prisma = new PrismaClient();
 
 export async function GET(
   req: NextRequest,
-  context: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const problemId = context.params.id;
+  const { id: problemId } = await params;
   const session = await auth.api.getSession({
     headers: await headers(),
   });
@@ -59,4 +59,4 @@ export async function GET(
       { status: 500 }
     );
   }
-} 
+}

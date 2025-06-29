@@ -9,14 +9,12 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Calendar,
   MapPin,
   Users,
   Plus,
-  Search,
   BookOpen,
   Clock,
   Code,
@@ -59,23 +57,16 @@ interface Event {
   };
 }
 
-export default function EventsPage({
-  searchParams,
-}: {
-  searchParams?: { [key: string]: string | string[] | undefined };
-}) {
+export default function EventsPage() {
   const router = useRouter();
   const pathname = usePathname();
 
   const [events, setEvents] = useState<Event[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const {data: session} = useSession();
+  const { data: session } = useSession();
   const [myEvents, setMyEvents] = useState<Event[] | null>(null);
   const [registeredIds, setRegisteredIds] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-
-  const rawQ = searchParams?.q ?? "";
-  const searchQuery = (Array.isArray(rawQ) ? rawQ[0] : rawQ) || "";
 
   const now = new Date();
   const upcomingEvents = events.filter((ev) => ev.date >= now);
@@ -94,7 +85,7 @@ export default function EventsPage({
         if (session) {
           const myEventsResult = await getEventsByOrganizer(session.user.id);
           if (myEventsResult.success) {
-            setMyEvents(myEventsResult.data);
+            setMyEvents(myEventsResult.data ?? null);
           }
           const registered = await getRegisteredEventIds(session.user.id);
           setRegisteredIds(registered);
@@ -114,19 +105,13 @@ export default function EventsPage({
       router.push("/register");
       return;
     }
-    const eventId = formData.get("eventId") as string;
-    if (session?.user?.id) {
-      await registerForEvent(session.user.id, eventId);
-      const updatedRegisteredIds = await getRegisteredEventIds(
-        session.user.id
-      );
-      setRegisteredIds(updatedRegisteredIds);
-    }
+    await registerForEvent(formData);
+    const updatedRegisteredIds = await getRegisteredEventIds(session.user.id);
+    setRegisteredIds(updatedRegisteredIds);
   }
 
   async function handleCancel(formData: FormData) {
-    const eventId = formData.get("eventId") as string;
-    await cancelEvent(eventId);
+    await cancelEvent(formData);
     const updatedEvents = await getEvents();
     if (updatedEvents.success) {
       setEvents(updatedEvents.data || []);
@@ -134,13 +119,17 @@ export default function EventsPage({
     if (session?.user?.id) {
       const myEventsResult = await getEventsByOrganizer(session.user.id);
       if (myEventsResult.success) {
-        setMyEvents(myEventsResult.data);
+        setMyEvents(myEventsResult.data ?? null);
       }
     }
   }
 
   if (isLoading) {
-    return <div className="flex justify-center items-center h-screen">Loading...</div>;
+    return (
+      <div className="flex justify-center items-center h-screen">
+        Loading...
+      </div>
+    );
   }
 
   return (
@@ -167,9 +156,11 @@ export default function EventsPage({
             <div className="flex items-center space-x-4">
               <Button
                 className={`px-5 py-2 rounded-lg font-bold border-2
-                  ${pathname === "/dashboard" ?
-                    'bg-[#232323] text-[#FFB74D] border-[#FFB74D] shadow-[6px_6px_0px_0px_#000000]' :
-                    'bg-transparent text-black border-transparent hover:bg-[#FFF8E1] hover:text-[#A63D00] transition-all duration-300'}
+                  ${
+                    pathname === "/dashboard"
+                      ? "bg-[#232323] text-[#FFB74D] border-[#FFB74D] shadow-[6px_6px_0px_0px_#000000]"
+                      : "bg-transparent text-black border-transparent hover:bg-[#FFF8E1] hover:text-[#A63D00] transition-all duration-300"
+                  }
                 `}
                 onClick={() => router.push("/dashboard")}
               >
@@ -177,9 +168,11 @@ export default function EventsPage({
               </Button>
               <Button
                 className={`px-5 py-2 rounded-lg font-bold border-2
-                  ${pathname === "/problems" ?
-                    'bg-[#232323] text-[#FFB74D] border-[#FFB74D] shadow-[6px_6px_0px_0px_#000000]' :
-                    'bg-transparent text-black border-transparent hover:bg-[#FFF8E1] hover:text-[#A63D00] transition-all duration-300'}
+                  ${
+                    pathname === "/problems"
+                      ? "bg-[#232323] text-[#FFB74D] border-[#FFB74D] shadow-[6px_6px_0px_0px_#000000]"
+                      : "bg-transparent text-black border-transparent hover:bg-[#FFF8E1] hover:text-[#A63D00] transition-all duration-300"
+                  }
                 `}
                 onClick={() => router.push("/problems")}
               >
@@ -187,9 +180,11 @@ export default function EventsPage({
               </Button>
               <Button
                 className={`px-5 py-2 rounded-lg font-bold border-2
-                  ${pathname === "/mentors" ?
-                    'bg-[#232323] text-[#FFB74D] border-[#FFB74D] shadow-[6px_6px_0px_0px_#000000]' :
-                    'bg-transparent text-black border-transparent hover:bg-[#FFF8E1] hover:text-[#A63D00] transition-all duration-300'}
+                  ${
+                    pathname === "/mentors"
+                      ? "bg-[#232323] text-[#FFB74D] border-[#FFB74D] shadow-[6px_6px_0px_0px_#000000]"
+                      : "bg-transparent text-black border-transparent hover:bg-[#FFF8E1] hover:text-[#A63D00] transition-all duration-300"
+                  }
                 `}
                 onClick={() => router.push("/mentors")}
               >
@@ -197,9 +192,11 @@ export default function EventsPage({
               </Button>
               <Button
                 className={`px-5 py-2 rounded-lg font-bold border-2
-                  ${pathname === "/knowledge" ?
-                    'bg-[#232323] text-[#FFB74D] border-[#FFB74D] shadow-[6px_6px_0px_0px_#000000]' :
-                    'bg-transparent text-black border-transparent hover:bg-[#FFF8E1] hover:text-[#A63D00] transition-all duration-300'}
+                  ${
+                    pathname === "/knowledge"
+                      ? "bg-[#232323] text-[#FFB74D] border-[#FFB74D] shadow-[6px_6px_0px_0px_#000000]"
+                      : "bg-transparent text-black border-transparent hover:bg-[#FFF8E1] hover:text-[#A63D00] transition-all duration-300"
+                  }
                 `}
                 onClick={() => router.push("/knowledge")}
               >
@@ -207,9 +204,11 @@ export default function EventsPage({
               </Button>
               <Button
                 className={`px-5 py-2 rounded-lg font-bold border-2
-                  ${pathname === "/events" ?
-                    'bg-[#232323] text-[#FFB74D] border-[#FFB74D] shadow-[6px_6px_0px_0px_#000000]' :
-                    'bg-transparent text-black border-transparent hover:bg-[#FFF8E1] hover:text-[#A63D00] transition-all duration-300'}
+                  ${
+                    pathname === "/events"
+                      ? "bg-[#232323] text-[#FFB74D] border-[#FFB74D] shadow-[6px_6px_0px_0px_#000000]"
+                      : "bg-transparent text-black border-transparent hover:bg-[#FFF8E1] hover:text-[#A63D00] transition-all duration-300"
+                  }
                 `}
                 onClick={() => router.push("/events")}
               >
@@ -217,15 +216,21 @@ export default function EventsPage({
               </Button>
               <Button
                 className={`px-5 py-2 rounded-lg font-bold border-2
-                  ${pathname === "/updates" ?
-                    'bg-[#232323] text-[#FFB74D] border-[#FFB74D] shadow-[6px_6px_0px_0px_#000000]' :
-                    'bg-transparent text-black border-transparent hover:bg-[#FFF8E1] hover:text-[#A63D00] transition-all duration-300'}
+                  ${
+                    pathname === "/updates"
+                      ? "bg-[#232323] text-[#FFB74D] border-[#FFB74D] shadow-[6px_6px_0px_0px_#000000]"
+                      : "bg-transparent text-black border-transparent hover:bg-[#FFF8E1] hover:text-[#A63D00] transition-all duration-300"
+                  }
                 `}
                 onClick={() => router.push("/updates")}
               >
                 Updates
               </Button>
-              <Button variant="ghost" size="sm" className="group relative p-0 w-8 h-8 flex items-center justify-center">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="group relative p-0 w-8 h-8 flex items-center justify-center"
+              >
                 <Bell className="h-8 w-8 group-hover:fill-[#A63D00] group-hover:text-[#A63D00] transition-all duration-300 group-hover:animate-pulse" />
                 <div className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-[#A63D00] rounded-full group-hover:animate-ping"></div>
               </Button>
@@ -265,19 +270,6 @@ export default function EventsPage({
             </Link>
           </div>
 
-          {/* Search */}
-          <div className="mb-8">
-            <form className="relative" method="get" action="/events">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-              <Input
-                name="q"
-                defaultValue={searchQuery}
-                placeholder="Search events..."
-                className="pl-10"
-              />
-            </form>
-          </div>
-
           {/* Event Tabs */}
           <Tabs defaultValue="upcoming" className="space-y-8">
             <TabsList className="grid w-full grid-cols-4 bg-white border border-[#A63D00]/20">
@@ -310,7 +302,9 @@ export default function EventsPage({
             {/* Upcoming Events */}
             <TabsContent value="upcoming" className="space-y-6">
               <div className="grid grid-cols-1 gap-4">
-                {error && <p className="text-red-500">Could not fetch events.</p>}
+                {error && (
+                  <p className="text-red-500">Could not fetch events.</p>
+                )}
                 {upcomingEvents.length === 0 ? (
                   <p className="text-gray-600">No upcoming events found.</p>
                 ) : (
@@ -320,7 +314,9 @@ export default function EventsPage({
                       className="border-2 border-black p-6 rounded-md bg-[#FFF8E1] hover:shadow-xl transition-all"
                     >
                       <div className="flex justify-between items-center mb-2">
-                        <h2 className="text-xl font-bold text-[#232323]">{event.title}</h2>
+                        <h2 className="text-xl font-bold text-[#232323]">
+                          {event.title}
+                        </h2>
                         <span className="text-sm text-gray-700">
                           {event.date.toLocaleDateString()}
                         </span>
@@ -331,7 +327,8 @@ export default function EventsPage({
                           <MapPin className="h-4 w-4 mr-1" /> {event.location}
                         </span>
                         <span className="flex items-center">
-                          <Users className="h-4 w-4 mr-1" /> {event.organizer.name}
+                          <Users className="h-4 w-4 mr-1" />{" "}
+                          {event.organizer.name}
                         </span>
                       </div>
                       <div className="mt-4">
@@ -395,7 +392,9 @@ export default function EventsPage({
                       className="border-2 border-black p-6 rounded-md bg-[#FFF8E1] hover:shadow-xl transition-all"
                     >
                       <div className="flex justify-between items-center mb-2">
-                        <h2 className="text-xl font-bold text-[#232323]">{event.title}</h2>
+                        <h2 className="text-xl font-bold text-[#232323]">
+                          {event.title}
+                        </h2>
                         <span className="text-sm text-gray-700">
                           {event.date.toLocaleDateString()}
                         </span>
@@ -406,7 +405,8 @@ export default function EventsPage({
                           <MapPin className="h-4 w-4 mr-1" /> {event.location}
                         </span>
                         <span className="flex items-center">
-                          <Users className="h-4 w-4 mr-1" /> {event.organizer.name}
+                          <Users className="h-4 w-4 mr-1" />{" "}
+                          {event.organizer.name}
                         </span>
                       </div>
                       <div className="mt-4">
@@ -436,12 +436,16 @@ export default function EventsPage({
                         className="border-2 border-black p-6 rounded-md bg-[#FFF8E1] hover:shadow-xl transition-all"
                       >
                         <div className="flex justify-between items-center mb-2">
-                          <h2 className="text-xl font-bold text-[#232323]">{event.title}</h2>
+                          <h2 className="text-xl font-bold text-[#232323]">
+                            {event.title}
+                          </h2>
                           <span className="text-sm text-gray-700">
                             {event.date.toLocaleDateString()}
                           </span>
                         </div>
-                        <p className="text-[#232323] mb-2">{event.description}</p>
+                        <p className="text-[#232323] mb-2">
+                          {event.description}
+                        </p>
                         <div className="flex items-center space-x-4 text-sm text-gray-700">
                           <span className="flex items-center">
                             <MapPin className="h-4 w-4 mr-1" /> {event.location}
@@ -470,11 +474,15 @@ export default function EventsPage({
                       </div>
                     ))
                   ) : (
-                    <p className="text-gray-600">You haven't organized any events yet.</p>
+                    <p className="text-gray-600">
+                      You haven't organized any events yet.
+                    </p>
                   )}
                 </div>
               ) : (
-                <p className="text-gray-600">Please log in to view your events.</p>
+                <p className="text-gray-600">
+                  Please log in to view your events.
+                </p>
               )}
             </TabsContent>
 
@@ -482,27 +490,34 @@ export default function EventsPage({
             <TabsContent value="registered" className="space-y-6">
               {session ? (
                 <div className="grid grid-cols-1 gap-4">
-                  {events.filter(e => registeredIds.includes(e.id)).length > 0 ? (
+                  {events.filter((e) => registeredIds.includes(e.id)).length >
+                  0 ? (
                     events
-                      .filter(e => registeredIds.includes(e.id))
+                      .filter((e) => registeredIds.includes(e.id))
                       .map((event) => (
                         <div
                           key={event.id}
                           className="border-2 border-black p-6 rounded-md bg-[#FFF8E1] hover:shadow-xl transition-all"
                         >
                           <div className="flex justify-between items-center mb-2">
-                            <h2 className="text-xl font-bold text-[#232323]">{event.title}</h2>
+                            <h2 className="text-xl font-bold text-[#232323]">
+                              {event.title}
+                            </h2>
                             <span className="text-sm text-gray-700">
                               {event.date.toLocaleDateString()}
                             </span>
                           </div>
-                          <p className="text-[#232323] mb-2">{event.description}</p>
+                          <p className="text-[#232323] mb-2">
+                            {event.description}
+                          </p>
                           <div className="flex items-center space-x-4 text-sm text-gray-700">
                             <span className="flex items-center">
-                              <MapPin className="h-4 w-4 mr-1" /> {event.location}
+                              <MapPin className="h-4 w-4 mr-1" />{" "}
+                              {event.location}
                             </span>
                             <span className="flex items-center">
-                              <Users className="h-4 w-4 mr-1" /> {event.organizer.name}
+                              <Users className="h-4 w-4 mr-1" />{" "}
+                              {event.organizer.name}
                             </span>
                           </div>
                           <div className="mt-4">
@@ -515,7 +530,10 @@ export default function EventsPage({
                                 Ended
                               </Button>
                             ) : (
-                              <Link href={`/events/${event.id}`} className="w-full">
+                              <Link
+                                href={`/events/${event.id}`}
+                                className="w-full"
+                              >
                                 <Button
                                   variant="outline"
                                   className="w-full border-[#A63D00] text-[#A63D00] hover:bg-[#A63D00]/10"
@@ -528,11 +546,15 @@ export default function EventsPage({
                         </div>
                       ))
                   ) : (
-                    <p className="text-gray-600">You haven't registered for any events yet.</p>
+                    <p className="text-gray-600">
+                      You haven't registered for any events yet.
+                    </p>
                   )}
                 </div>
               ) : (
-                <p className="text-gray-600">Please log in to view your registrations.</p>
+                <p className="text-gray-600">
+                  Please log in to view your registrations.
+                </p>
               )}
             </TabsContent>
           </Tabs>
