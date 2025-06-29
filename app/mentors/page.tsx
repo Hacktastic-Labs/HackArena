@@ -11,7 +11,6 @@ import Link from "next/link"
 import { useRouter, usePathname } from "next/navigation"
 import { signOut, useSession } from "@/app/lib/auth-client"
 import PageTransition from "@/components/PageTransition"
-import { useState } from "react";
 
 const BRUTALIST_COLORS = [
   '#FFF8E1', '#FFD580', '#FDE1BC', '#FFB800', '#F96D3A', '#FFEDC2'
