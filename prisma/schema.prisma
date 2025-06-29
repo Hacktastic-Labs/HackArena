@@ -41,7 +41,7 @@ model User {
   name            String?
   username        String?  @unique
   image           String?
-  skills          String[] @default([]) // A list of skills for matching
+  skills          String[]
   // Role of the user (STUDENT by default or MENTOR)
   role            Role     @default(STUDENT)
   createdAt       DateTime @default(now()) @map("created_at")
