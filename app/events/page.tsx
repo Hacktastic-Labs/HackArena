@@ -9,14 +9,12 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Calendar,
   MapPin,
   Users,
   Plus,
-  Search,
   BookOpen,
   Clock,
   Code,
@@ -24,6 +22,7 @@ import {
   Filter,
   Bell,
   LogOut,
+  Search,
 } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect } from "react";
@@ -37,6 +36,7 @@ import {
 import PageTransition from "@/components/PageTransition";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { signOut, useSession } from "@/app/lib/auth-client";
+import { Input } from "@/components/ui/input";
 
 interface Event {
   id: string;
@@ -64,31 +64,31 @@ const BRUTALIST_COLORS = [
 ];
 
 const EventCard = ({ event, isRegistered, onRegister, onCancel, session, color }: { event: Event, isRegistered: boolean, onRegister: any, onCancel: any, session: any, color: string }) => (
-    <Card className="border-4 border-black rounded-lg shadow-[8px_8px_0px_0px_#000] overflow-hidden" style={{ backgroundColor: color }}>
-        <CardHeader className="border-b-4 border-black p-4">
-            <CardTitle className="text-xl font-extrabold uppercase">{event.title}</CardTitle>
-            <CardDescription className="font-semibold text-black">
-                by {event.organizer.name}
-            </CardDescription>
-        </CardHeader>
-        <CardContent className="p-4">
-            <p className="mb-4 text-gray-700 font-medium h-20 overflow-hidden">{event.description}</p>
-            <div className="flex flex-col space-y-2 text-sm">
-                <div className="flex items-center gap-2 font-semibold"><Calendar className="w-4 h-4" /> {new Date(event.date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</div>
-                <div className="flex items-center gap-2 font-semibold"><MapPin className="w-4 h-4" /> {event.location}</div>
-            </div>
-            <div className="mt-4 flex justify-between items-center">
-                {event.organizerId === session?.user.id ? (
-                  <form action={onCancel}><input type="hidden" name="eventId" value={event.id} /><Button type="submit" variant="destructive" className="border-2 border-black font-bold shadow-[2px_2px_0_0_#000]">Cancel Event</Button></form>
-                ) : isRegistered ? (
-                  <Badge className="font-bold border-2 border-black shadow-[2px_2px_0_0_#000]">Registered</Badge>
-                ) : (
-                  <form action={onRegister}><input type="hidden" name="eventId" value={event.id} /><Button type="submit" className="bg-transparent border-2 border-black text-black font-bold hover:bg-black hover:text-white transition-all">Register</Button></form>
-                )}
-                <Link href={`/events/${event.id}`}><Button variant="secondary" className="bg-transparent border-2 border-black text-black font-bold hover:bg-black hover:text-white transition-all">View Details</Button></Link>
-            </div>
-        </CardContent>
-    </Card>
+  <Card className="border-4 border-black rounded-lg shadow-[8px_8px_0px_0px_#000] overflow-hidden" style={{ backgroundColor: color }}>
+    <CardHeader className="border-b-4 border-black p-4">
+      <CardTitle className="text-xl font-extrabold uppercase">{event.title}</CardTitle>
+      <CardDescription className="font-semibold text-black">
+        by {event.organizer.name}
+      </CardDescription>
+    </CardHeader>
+    <CardContent className="p-4">
+      <p className="mb-4 text-gray-700 font-medium h-20 overflow-hidden">{event.description}</p>
+      <div className="flex flex-col space-y-2 text-sm">
+        <div className="flex items-center gap-2 font-semibold"><Calendar className="w-4 h-4" /> {new Date(event.date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</div>
+        <div className="flex items-center gap-2 font-semibold"><MapPin className="w-4 h-4" /> {event.location}</div>
+      </div>
+      <div className="mt-4 flex justify-between items-center">
+        {event.organizerId === session?.user.id ? (
+          <form action={onCancel}><input type="hidden" name="eventId" value={event.id} /><Button type="submit" variant="destructive" className="border-2 border-black font-bold shadow-[2px_2px_0_0_#000]">Cancel Event</Button></form>
+        ) : isRegistered ? (
+          <Badge className="font-bold border-2 border-black shadow-[2px_2px_0_0_#000]">Registered</Badge>
+        ) : (
+          <form action={onRegister}><input type="hidden" name="eventId" value={event.id} /><Button type="submit" className="bg-transparent border-2 border-black text-black font-bold hover:bg-black hover:text-white transition-all">Register</Button></form>
+        )}
+        <Link href={`/events/${event.id}`}><Button variant="secondary" className="bg-transparent border-2 border-black text-black font-bold hover:bg-black hover:text-white transition-all">View Details</Button></Link>
+      </div>
+    </CardContent>
+  </Card>
 );
 
 export default function EventsPage({
@@ -101,13 +101,10 @@ export default function EventsPage({
 
   const [events, setEvents] = useState<Event[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const {data: session} = useSession();
+  const { data: session } = useSession();
   const [myEvents, setMyEvents] = useState<Event[] | null>(null);
   const [registeredIds, setRegisteredIds] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-
-  const rawQ = searchParams?.q ?? "";
-  const searchQuery = (Array.isArray(rawQ) ? rawQ[0] : rawQ) || "";
 
   const now = new Date();
   const upcomingEvents = events.filter((ev) => ev.date >= now);
@@ -147,9 +144,7 @@ export default function EventsPage({
       return;
     }
     await registerForEvent(formData);
-    const updatedRegisteredIds = await getRegisteredEventIds(
-      session.user.id
-    );
+    const updatedRegisteredIds = await getRegisteredEventIds(session.user.id);
     setRegisteredIds(updatedRegisteredIds);
   }
 
@@ -168,7 +163,11 @@ export default function EventsPage({
   }
 
   if (isLoading) {
-    return <div className="flex justify-center items-center h-screen">Loading...</div>;
+    return (
+      <div className="flex justify-center items-center h-screen">
+        Loading...
+      </div>
+    );
   }
 
   return (
@@ -195,9 +194,11 @@ export default function EventsPage({
             <div className="flex items-center space-x-4">
               <Button
                 className={`px-5 py-2 rounded-lg font-bold border-2
-                  ${pathname === "/dashboard" ?
-                    'bg-[#232323] text-[#FFB74D] border-[#FFB74D] shadow-[6px_6px_0px_0px_#000000]' :
-                    'bg-transparent text-black border-transparent hover:bg-[#FFF8E1] hover:text-[#A63D00] transition-all duration-300'}
+                  ${
+                    pathname === "/dashboard"
+                      ? "bg-[#232323] text-[#FFB74D] border-[#FFB74D] shadow-[6px_6px_0px_0px_#000000]"
+                      : "bg-transparent text-black border-transparent hover:bg-[#FFF8E1] hover:text-[#A63D00] transition-all duration-300"
+                  }
                 `}
                 onClick={() => router.push("/dashboard")}
               >
@@ -205,9 +206,11 @@ export default function EventsPage({
               </Button>
               <Button
                 className={`px-5 py-2 rounded-lg font-bold border-2
-                  ${pathname === "/problems" ?
-                    'bg-[#232323] text-[#FFB74D] border-[#FFB74D] shadow-[6px_6px_0px_0px_#000000]' :
-                    'bg-transparent text-black border-transparent hover:bg-[#FFF8E1] hover:text-[#A63D00] transition-all duration-300'}
+                  ${
+                    pathname === "/problems"
+                      ? "bg-[#232323] text-[#FFB74D] border-[#FFB74D] shadow-[6px_6px_0px_0px_#000000]"
+                      : "bg-transparent text-black border-transparent hover:bg-[#FFF8E1] hover:text-[#A63D00] transition-all duration-300"
+                  }
                 `}
                 onClick={() => router.push("/problems")}
               >
@@ -215,9 +218,11 @@ export default function EventsPage({
               </Button>
               <Button
                 className={`px-5 py-2 rounded-lg font-bold border-2
-                  ${pathname === "/mentors" ?
-                    'bg-[#232323] text-[#FFB74D] border-[#FFB74D] shadow-[6px_6px_0px_0px_#000000]' :
-                    'bg-transparent text-black border-transparent hover:bg-[#FFF8E1] hover:text-[#A63D00] transition-all duration-300'}
+                  ${
+                    pathname === "/mentors"
+                      ? "bg-[#232323] text-[#FFB74D] border-[#FFB74D] shadow-[6px_6px_0px_0px_#000000]"
+                      : "bg-transparent text-black border-transparent hover:bg-[#FFF8E1] hover:text-[#A63D00] transition-all duration-300"
+                  }
                 `}
                 onClick={() => router.push("/mentors")}
               >
@@ -225,9 +230,11 @@ export default function EventsPage({
               </Button>
               <Button
                 className={`px-5 py-2 rounded-lg font-bold border-2
-                  ${pathname === "/knowledge" ?
-                    'bg-[#232323] text-[#FFB74D] border-[#FFB74D] shadow-[6px_6px_0px_0px_#000000]' :
-                    'bg-transparent text-black border-transparent hover:bg-[#FFF8E1] hover:text-[#A63D00] transition-all duration-300'}
+                  ${
+                    pathname === "/knowledge"
+                      ? "bg-[#232323] text-[#FFB74D] border-[#FFB74D] shadow-[6px_6px_0px_0px_#000000]"
+                      : "bg-transparent text-black border-transparent hover:bg-[#FFF8E1] hover:text-[#A63D00] transition-all duration-300"
+                  }
                 `}
                 onClick={() => router.push("/knowledge")}
               >
@@ -235,9 +242,11 @@ export default function EventsPage({
               </Button>
               <Button
                 className={`px-5 py-2 rounded-lg font-bold border-2
-                  ${pathname === "/events" ?
-                    'bg-[#232323] text-[#FFB74D] border-[#FFB74D] shadow-[6px_6px_0px_0px_#000000]' :
-                    'bg-transparent text-black border-transparent hover:bg-[#FFF8E1] hover:text-[#A63D00] transition-all duration-300'}
+                  ${
+                    pathname === "/events"
+                      ? "bg-[#232323] text-[#FFB74D] border-[#FFB74D] shadow-[6px_6px_0px_0px_#000000]"
+                      : "bg-transparent text-black border-transparent hover:bg-[#FFF8E1] hover:text-[#A63D00] transition-all duration-300"
+                  }
                 `}
                 onClick={() => router.push("/events")}
               >
@@ -245,15 +254,21 @@ export default function EventsPage({
               </Button>
               <Button
                 className={`px-5 py-2 rounded-lg font-bold border-2
-                  ${pathname === "/updates" ?
-                    'bg-[#232323] text-[#FFB74D] border-[#FFB74D] shadow-[6px_6px_0px_0px_#000000]' :
-                    'bg-transparent text-black border-transparent hover:bg-[#FFF8E1] hover:text-[#A63D00] transition-all duration-300'}
+                  ${
+                    pathname === "/updates"
+                      ? "bg-[#232323] text-[#FFB74D] border-[#FFB74D] shadow-[6px_6px_0px_0px_#000000]"
+                      : "bg-transparent text-black border-transparent hover:bg-[#FFF8E1] hover:text-[#A63D00] transition-all duration-300"
+                  }
                 `}
                 onClick={() => router.push("/updates")}
               >
                 Updates
               </Button>
-              <Button variant="ghost" size="sm" className="group relative p-0 w-8 h-8 flex items-center justify-center">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="group relative p-0 w-8 h-8 flex items-center justify-center"
+              >
                 <Bell className="h-8 w-8 group-hover:fill-[#A63D00] group-hover:text-[#A63D00] transition-all duration-300 group-hover:animate-pulse" />
                 <div className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-[#A63D00] rounded-full group-hover:animate-ping"></div>
               </Button>
@@ -336,22 +351,89 @@ export default function EventsPage({
 
             <TabsContent value="all-events">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {upcomingEvents.map((event, index) => <EventCard key={event.id} event={event} isRegistered={registeredIds.includes(event.id)} onRegister={handleRegister} onCancel={handleCancel} session={session} color={BRUTALIST_COLORS[index % BRUTALIST_COLORS.length]} />)}
+                {upcomingEvents.map((event, index) => (
+                  <EventCard 
+                    key={event.id} 
+                    event={event} 
+                    isRegistered={registeredIds.includes(event.id)} 
+                    onRegister={handleRegister} 
+                    onCancel={handleCancel} 
+                    session={session} 
+                    color={BRUTALIST_COLORS[index % BRUTALIST_COLORS.length]} 
+                  />
+                ))}
               </div>
             </TabsContent>
             <TabsContent value="my-events">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {myEvents?.map((event, index) => <EventCard key={event.id} event={event} isRegistered={registeredIds.includes(event.id)} onRegister={handleRegister} onCancel={handleCancel} session={session} color={BRUTALIST_COLORS[index % BRUTALIST_COLORS.length]} />)}
+                {myEvents?.map((event, index) => (
+                  <EventCard 
+                    key={event.id} 
+                    event={event} 
+                    isRegistered={registeredIds.includes(event.id)} 
+                    onRegister={handleRegister} 
+                    onCancel={handleCancel} 
+                    session={session} 
+                    color={BRUTALIST_COLORS[index % BRUTALIST_COLORS.length]} 
+                  />
+                ))}
+                {myEvents?.length === 0 && (
+                  <div className="col-span-3 text-center py-8">
+                    <p className="text-xl font-bold">You haven't organized any events yet.</p>
+                    <Link href="/events/create">
+                      <Button className="mt-4 font-bold border-2 border-black rounded-lg bg-yellow-400 text-black shadow-[4px_4px_0_0_#000] hover:bg-yellow-500 hover:shadow-[6px_6px_0_0_#000] transition-all">
+                        Create Your First Event
+                      </Button>
+                    </Link>
+                  </div>
+                )}
               </div>
             </TabsContent>
             <TabsContent value="hackathons">
-              {/* Hackathons content */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {upcomingEvents
+                  .filter(event => event.title.toLowerCase().includes('hackathon'))
+                  .map((event, index) => (
+                    <EventCard 
+                      key={event.id} 
+                      event={event} 
+                      isRegistered={registeredIds.includes(event.id)} 
+                      onRegister={handleRegister} 
+                      onCancel={handleCancel} 
+                      session={session} 
+                      color={BRUTALIST_COLORS[index % BRUTALIST_COLORS.length]} 
+                    />
+                  ))}
+                {upcomingEvents.filter(event => event.title.toLowerCase().includes('hackathon')).length === 0 && (
+                  <div className="col-span-3 text-center py-8">
+                    <p className="text-xl font-bold">No upcoming hackathons found.</p>
+                  </div>
+                )}
+              </div>
             </TabsContent>
             <TabsContent value="workshops">
-              {/* Workshops content */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {upcomingEvents
+                  .filter(event => event.title.toLowerCase().includes('workshop'))
+                  .map((event, index) => (
+                    <EventCard 
+                      key={event.id} 
+                      event={event} 
+                      isRegistered={registeredIds.includes(event.id)} 
+                      onRegister={handleRegister} 
+                      onCancel={handleCancel} 
+                      session={session} 
+                      color={BRUTALIST_COLORS[index % BRUTALIST_COLORS.length]} 
+                    />
+                  ))}
+                {upcomingEvents.filter(event => event.title.toLowerCase().includes('workshop')).length === 0 && (
+                  <div className="col-span-3 text-center py-8">
+                    <p className="text-xl font-bold">No upcoming workshops found.</p>
+                  </div>
+                )}
+              </div>
             </TabsContent>
           </Tabs>
-
         </div>
       </PageTransition>
     </div>

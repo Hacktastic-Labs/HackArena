@@ -10,16 +10,12 @@ import {
 } from "@/components/ui/card";
 import Link from "next/link";
 
-interface EventDetailPageProps {
-  params: {
-    id: string;
-  };
-}
-
 export default async function EventDetailPage({
   params,
-}: EventDetailPageProps) {
-  const { id } = params;
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
   const { success, data } = await getEventWithParticipants(id);
 
   if (!success || !data) {

@@ -7,9 +7,9 @@ const prisma = new PrismaClient();
 
 export async function GET(
   req: NextRequest,
-  context: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const id = context.params.id;
+  const { id } = await params;
   try {
     const problem = await prisma.problem.findUnique({
       where: { id: id },
@@ -40,7 +40,7 @@ export async function GET(
 
 export async function PATCH(
   req: NextRequest,
-  context: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await auth.api.getSession({
     headers: await headers(),
@@ -50,7 +50,7 @@ export async function PATCH(
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
 
-  const problemId = context.params.id;
+  const { id: problemId } = await params;
   const body = await req.json();
   const { title, description, tags, status } = body;
 
@@ -67,7 +67,10 @@ export async function PATCH(
 
     if (status) {
       if (problem.mentorId !== session.user.id) {
-        return NextResponse.json({ error: "Only the assigned mentor can change the status" }, { status: 403 });
+        return NextResponse.json(
+          { error: "Only the assigned mentor can change the status" },
+          { status: 403 }
+        );
       }
       updatedProblem = await prisma.problem.update({
         where: { id: problemId },
@@ -98,4 +101,4 @@ export async function PATCH(
       { status: 500 }
     );
   }
-} 
+}
