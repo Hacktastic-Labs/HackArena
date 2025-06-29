@@ -254,17 +254,37 @@ export default function ProblemsPage() {
                           ))}
                         </div>
                       )}
-                      <div className="flex items-center justify-between mt-6">
-                        {statusBadge}
-                        <div className="text-sm text-gray-600 font-semibold">
-                          Created {new Date(problem.createdAt).toLocaleDateString()}
-                        </div>
-                        {problem.mentor ? (
-                          <button className="bg-black text-[#FFB74D] font-bold border-2 border-black rounded-md px-6 py-2">Chat</button>
-                        ) : (
-                          <button className="bg-[#FFB74D] text-black font-bold border-2 border-black rounded-md px-6 py-2 transition-colors duration-200 hover:bg-[#FFA726]">Find Mentor</button>
-                        )}
-                      </div>
+<div className="flex items-center justify-between mt-6 flex-wrap gap-2">
+  {/* Status Badge */}
+  {statusBadge}
+
+  {/* Created Date */}
+  <div className="text-sm text-gray-600 font-semibold">
+    Created {new Date(problem.createdAt).toLocaleDateString()}
+  </div>
+
+  {/* Action Button */}
+  {problem.mentor ? (
+    <Button
+      variant="outline"
+      size="sm"
+      className="border-black text-[#FFB74D] font-bold bg-black hover:bg-black/90"
+      onClick={() => router.push(`/problems/${problem.id}`)}
+    >
+      <MessageSquare className="h-4 w-4 mr-2" />
+      Chat
+    </Button>
+  ) : (
+    <Button
+      variant="outline"
+      size="sm"
+      className="border-black text-black font-bold bg-[#FFB74D] hover:bg-[#FFA726]"
+    >
+      Find Mentor
+    </Button>
+  )}
+</div>
+
                     </div>
                   </div>
                 );
