@@ -26,6 +26,7 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useMentorProblems } from "@/app/lib/use-mentor-problems";
 import { CreateAnnouncementModal } from "@/components/create-announcement-modal";
+import Link from "next/link";
 
 export default function MentorDashboardPage() {
   const { data: session, isPending } = useSession();
@@ -85,6 +86,11 @@ export default function MentorDashboardPage() {
       console.error("Error assigning problem:", error);
     }
   };
+
+  const myAssignedProblems = problems.filter(
+    (p) => p.mentor?.id === session?.user.id
+  );
+  const openProblems = problems.filter((p) => p.status === "OPEN" && !p.mentor);
 
   useEffect(() => {
     if (!isPending && !session) {
@@ -266,12 +272,8 @@ export default function MentorDashboardPage() {
               <CardHeader>
                 <div className="flex justify-between items-center">
                   <CardTitle className="text-xl">
-                    Recent Student Queries
+                    My Assigned Problems
                   </CardTitle>
-                  <Button className="bg-[#A63D00] hover:bg-[#A63D00]/90">
-                    <Plus className="h-4 w-4 mr-2" />
-                    View All Problems ({problems.length})
-                  </Button>
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -282,30 +284,21 @@ export default function MentorDashboardPage() {
                       Loading problems...
                     </span>
                   </div>
-                ) : problems.length === 0 ? (
+                ) : myAssignedProblems.length === 0 ? (
                   <div className="text-center py-8">
                     <MessageSquare className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                     <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                      No student problems yet
+                      No problems assigned to you yet.
                     </h3>
                     <p className="text-gray-600">
-                      When students post problems, they'll appear here for you
-                      to help with.
+                      When a student assigns you to a problem, or you take one, it will appear here.
                     </p>
                   </div>
                 ) : (
-                  problems.slice(0, 5).map((problem) => (
+                  myAssignedProblems.map((problem) => (
                     <div
                       key={problem.id}
-                      className={`border-l-4 pl-4 ${
-                        problem.status === "OPEN"
-                          ? "border-blue-500"
-                          : problem.status === "IN_PROGRESS"
-                          ? "border-orange-500"
-                          : problem.status === "RESOLVED"
-                          ? "border-green-500"
-                          : "border-gray-500"
-                      }`}
+                      className="border-l-4 pl-4 border-orange-500"
                     >
                       <div className="flex justify-between items-start mb-2">
                         <div className="flex-1">
@@ -351,30 +344,16 @@ export default function MentorDashboardPage() {
                           <span>{getTimeAgo(problem.createdAt)}</span>
                         </div>
                         <div className="flex space-x-2">
-                          {problem.mentor ? (
-                            problem.mentor.name === session?.user?.name ? (
-                              <Button
-                                size="sm"
-                                className="bg-[#A63D00] hover:bg-[#A63D00]/90"
-                              >
-                                <MessageSquare className="h-3 w-3 mr-1" />
-                                Continue
-                              </Button>
-                            ) : (
-                              <Button size="sm" variant="outline" disabled>
-                                Assigned to {problem.mentor.name}
-                              </Button>
-                            )
-                          ) : (
-                            <Button
+                           <Button
                               size="sm"
                               className="bg-[#A63D00] hover:bg-[#A63D00]/90"
-                              onClick={() => handleAssignToMe(problem.id)}
+                              asChild
                             >
-                              <Plus className="h-3 w-3 mr-1" />
-                              Take This
+                              <Link href={`/problems/${problem.id}`}>
+                                <MessageSquare className="h-3 w-3 mr-1" />
+                                Continue
+                              </Link>
                             </Button>
-                          )}
                         </div>
                       </div>
                     </div>
@@ -382,6 +361,107 @@ export default function MentorDashboardPage() {
                 )}
               </CardContent>
             </Card>
+
+            <div className="lg:col-span-2 mt-6">
+            <Card className="border-[#A63D00]/20">
+              <CardHeader>
+                <div className="flex justify-between items-center">
+                  <CardTitle className="text-xl">
+                    Open Queries
+                  </CardTitle>
+                  <Button className="bg-[#A63D00] hover:bg-[#A63D00]/90">
+                    <Link href="/problems">
+                      <Eye className="h-4 w-4 mr-2" />
+                      View All Problems ({problems.length})
+                    </Link>
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {problemsLoading ? (
+                  <div className="flex items-center justify-center py-8">
+                    <Loader2 className="h-8 w-8 animate-spin text-[#A63D00]" />
+                    <span className="ml-2 text-gray-600">
+                      Loading problems...
+                    </span>
+                  </div>
+                ) : openProblems.length === 0 ? (
+                  <div className="text-center py-8">
+                    <MessageSquare className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                      No open student problems yet
+                    </h3>
+                    <p className="text-gray-600">
+                      When students post problems, they'll appear here for you
+                      to help with.
+                    </p>
+                  </div>
+                ) : (
+                  openProblems.slice(0, 5).map((problem) => (
+                    <div
+                      key={problem.id}
+                      className="border-l-4 pl-4 border-blue-500"
+                    >
+                      <div className="flex justify-between items-start mb-2">
+                        <div className="flex-1">
+                          <h4 className="font-semibold">{problem.title}</h4>
+                          <p className="text-sm text-gray-600">
+                            {problem.description.length > 80
+                              ? `${problem.description.substring(0, 80)}...`
+                              : problem.description}
+                          </p>
+                          {problem.tags.length > 0 && (
+                            <div className="flex space-x-1 mt-2">
+                              {problem.tags.slice(0, 3).map((tag, index) => (
+                                <Badge
+                                  key={index}
+                                  variant="secondary"
+                                  className="text-xs"
+                                >
+                                  {tag}
+                                </Badge>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                        {getStatusBadge(problem.status)}
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-4 text-sm text-gray-500">
+                          <div className="flex items-center space-x-2">
+                            <Avatar className="h-5 w-5">
+                              <AvatarImage
+                                src={
+                                  problem.user.image ||
+                                  "/placeholder.svg?height=20&width=20"
+                                }
+                              />
+                              <AvatarFallback className="bg-[#A63D00] text-white text-xs">
+                                {problem.user.name?.charAt(0)?.toUpperCase() ||
+                                  "S"}
+                              </AvatarFallback>
+                            </Avatar>
+                            <span>{problem.user.name || "Student"}</span>
+                          </div>
+                          <span>{getTimeAgo(problem.createdAt)}</span>
+                        </div>
+                        <div className="flex space-x-2">
+                          <Button
+                            size="sm"
+                            className="bg-[#A63D00] hover:bg-[#A63D00]/90"
+                            onClick={() => handleAssignToMe(problem.id)}
+                          >
+                            <Plus className="h-3 w-3 mr-1" />
+                            Take This
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </CardContent>
+            </Card>
+            </div>
           </div>
 
           {/* Sidebar */}

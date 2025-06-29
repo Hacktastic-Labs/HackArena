@@ -10,7 +10,7 @@ import { Search, Filter, Star, MessageSquare, Video, Calendar, MapPin, Clock, Us
 import Link from "next/link"
 import { useRouter, usePathname } from "next/navigation"
 import { signOut, useSession } from "@/app/lib/auth-client"
-import PageTransition from "@/components/PageTransition"
+import PageTransition from "@/components/PageTransition"  
 
 const BRUTALIST_COLORS = [
   '#FFF8E1', '#FFD580', '#FDE1BC', '#FFB800', '#F96D3A', '#FFEDC2'
@@ -30,7 +30,7 @@ interface Mentor {
   // Add other mentor-specific fields if they exist in your User model
   // For example:
   // title: string | null;
-  // expertise: string[];
+  skills: string[];
 }
 
 export default function MentorsPage() {
@@ -206,329 +206,6 @@ export default function MentorsPage() {
             </div>
           </div>
 
-          {/* Featured Mentors */}
-          <div className="mb-12">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Featured Mentors</h2>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <Card className="border-4 border-black rounded-xl shadow-[4px_4px_0_0_#000] bg-[#FFF8E1] hover:shadow-lg transition-shadow p-8 mb-14 animate-float" style={{ backgroundColor: BRUTALIST_COLORS[0], border: '4px solid #000' }}>
-                <CardHeader className="text-center">
-                  <Avatar className="h-20 w-20 mx-auto mb-4 ring-4 ring-black">
-                    <AvatarImage src="/placeholder.svg?height=80&width=80" />
-                    <AvatarFallback className="bg-[#A63D00] text-white text-xl">AL</AvatarFallback>
-                  </Avatar>
-                  <CardTitle className="text-xl font-extrabold border-b-4 border-black">Alex Chen</CardTitle>
-                  <CardDescription>Senior Software Engineer at Google</CardDescription>
-                  <div className="flex items-center justify-center space-x-1 mt-2">
-                    <Star className="h-4 w-4 text-yellow-400 fill-current" />
-                    <span className="font-medium">4.9</span>
-                    <span className="text-gray-600">(127 reviews)</span>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="flex flex-wrap gap-2">
-                      <Badge className="border-2 border-black rounded-full px-3 py-1 font-bold uppercase bg-[#FF6B35] text-white mx-1 my-1">React</Badge>
-                      <Badge className="border-2 border-black rounded-full px-3 py-1 font-bold uppercase bg-[#4ECDC4] text-white mx-1 my-1">Node.js</Badge>
-                      <Badge className="border-2 border-black rounded-full px-3 py-1 font-bold uppercase bg-[#8B3400] text-white mx-1 my-1">System Design</Badge>
-                    </div>
-                    <p className="text-sm text-gray-600">
-                      5+ years helping students master full-stack development and prepare for technical interviews.
-                    </p>
-                    <div className="flex items-center space-x-4 text-sm text-gray-600">
-                      <div className="flex items-center space-x-1">
-                        <Users className="h-4 w-4" />
-                        <span>89 students</span>
-                      </div>
-                      <div className="flex items-center space-x-1">
-                        <Award className="h-4 w-4" />
-                        <span>Top Mentor</span>
-                      </div>
-                    </div>
-                    <div className="flex space-x-2">
-                      <Button className="border-2 border-black rounded-md font-bold bg-[#A63D00] hover:bg-[#A63D00]/90 text-white px-6 py-2">Connect</Button>
-                      <Button variant="outline" className="border-2 border-black text-black bg-transparent px-6 py-2 mx-1">
-                        <MessageSquare className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="border-4 border-black rounded-xl shadow-[4px_4px_0_0_#000] bg-[#4ECDC4]/20 hover:shadow-lg transition-shadow p-8 mb-14 animate-float" style={{ backgroundColor: BRUTALIST_COLORS[1], border: '4px solid #000' }}>
-                <CardHeader className="text-center">
-                  <Avatar className="h-20 w-20 mx-auto mb-4 ring-4 ring-black">
-                    <AvatarImage src="/placeholder.svg?height=80&width=80" />
-                    <AvatarFallback className="bg-[#4ECDC4] text-white text-xl">SM</AvatarFallback>
-                  </Avatar>
-                  <CardTitle className="text-xl font-extrabold border-b-4 border-black">Sarah Martinez</CardTitle>
-                  <CardDescription>ML Engineer at OpenAI</CardDescription>
-                  <div className="flex items-center justify-center space-x-1 mt-2">
-                    <Star className="h-4 w-4 text-yellow-400 fill-current" />
-                    <span className="font-medium">4.8</span>
-                    <span className="text-gray-600">(94 reviews)</span>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="flex flex-wrap gap-2">
-                      <Badge className="border-2 border-black rounded-full px-3 py-1 font-bold uppercase bg-[#8B3400] text-white mx-1 my-1">Python</Badge>
-                      <Badge className="border-2 border-black rounded-full px-3 py-1 font-bold uppercase bg-[#FF6B35] text-white mx-1 my-1">Machine Learning</Badge>
-                      <Badge className="border-2 border-black rounded-full px-3 py-1 font-bold uppercase bg-[#4ECDC4] text-white mx-1 my-1">TensorFlow</Badge>
-                    </div>
-                    <p className="text-sm text-gray-600">
-                      Expert in AI/ML with focus on deep learning and natural language processing applications.
-                    </p>
-                    <div className="flex items-center space-x-4 text-sm text-gray-600">
-                      <div className="flex items-center space-x-1">
-                        <Users className="h-4 w-4" />
-                        <span>67 students</span>
-                      </div>
-                      <div className="flex items-center space-x-1">
-                        <Award className="h-4 w-4" />
-                        <span>AI Expert</span>
-                      </div>
-                    </div>
-                    <div className="flex space-x-2">
-                      <Button className="border-2 border-black rounded-md font-bold bg-[#4ECDC4] hover:bg-[#44B3AC] text-white px-6 py-2">Connect</Button>
-                      <Button variant="outline" className="border-2 border-black text-black bg-transparent px-6 py-2 mx-1">
-                        <Video className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="border-4 border-black rounded-xl shadow-[4px_4px_0_0_#000] bg-[#FF6B35]/20 hover:shadow-lg transition-shadow p-8 mb-14 animate-float" style={{ backgroundColor: BRUTALIST_COLORS[2], border: '4px solid #000' }}>
-                <CardHeader className="text-center">
-                  <Avatar className="h-20 w-20 mx-auto mb-4 ring-4 ring-black">
-                    <AvatarImage src="/placeholder.svg?height=80&width=80" />
-                    <AvatarFallback className="bg-[#FF6B35] text-white text-xl">MJ</AvatarFallback>
-                  </Avatar>
-                  <CardTitle className="text-xl font-extrabold border-b-4 border-black">Michael Johnson</CardTitle>
-                  <CardDescription>Principal Engineer at Netflix</CardDescription>
-                  <div className="flex items-center justify-center space-x-1 mt-2">
-                    <Star className="h-4 w-4 text-yellow-400 fill-current" />
-                    <span className="font-medium">4.9</span>
-                    <span className="text-gray-600">(156 reviews)</span>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="flex flex-wrap gap-2">
-                      <Badge className="border-2 border-black rounded-full px-3 py-1 font-bold uppercase bg-[#4ECDC4] text-white mx-1 my-1">Java</Badge>
-                      <Badge className="border-2 border-black rounded-full px-3 py-1 font-bold uppercase bg-[#8B3400] text-white mx-1 my-1">Microservices</Badge>
-                      <Badge className="border-2 border-black rounded-full px-3 py-1 font-bold uppercase bg-[#FF6B35] text-white mx-1 my-1">AWS</Badge>
-                    </div>
-                    <p className="text-sm text-gray-600">
-                      Specializes in distributed systems, microservices architecture, and cloud infrastructure.
-                    </p>
-                    <div className="flex items-center space-x-4 text-sm text-gray-600">
-                      <div className="flex items-center space-x-1">
-                        <Users className="h-4 w-4" />
-                        <span>112 students</span>
-                      </div>
-                      <div className="flex items-center space-x-1">
-                        <Award className="h-4 w-4" />
-                        <span>Cloud Expert</span>
-                      </div>
-                    </div>
-                    <div className="flex space-x-2">
-                      <Button className="border-2 border-black rounded-md font-bold bg-[#FF6B35] hover:bg-[#E55A2B] text-white px-6 py-2">Connect</Button>
-                      <Button variant="outline" className="border-2 border-black text-black bg-transparent px-6 py-2 mx-1">
-                        <Calendar className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-
-          {/* All Mentors */}
-          <div>
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold text-gray-900">All Mentors</h2>
-              <div className="flex space-x-2">
-                <Button variant="outline" className="border-2 border-black text-black bg-transparent">
-                  Sort by Rating
-                </Button>
-                <Button variant="outline" className="border-2 border-black text-black bg-transparent">
-                  Sort by Experience
-                </Button>
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              <Card className="border-4 border-black rounded-xl shadow-[4px_4px_0_0_#000] bg-[#FFF8E1] p-8 mb-14" style={{ backgroundColor: '#FFF8E1', border: '4px solid #000' }} onMouseEnter={() => setHoveredCard(0)} onMouseLeave={() => setHoveredCard(null)}>
-                <CardContent className="p-6">
-                  <div className="flex items-start space-x-4">
-                    <Avatar className="h-16 w-16 border-4 border-black">
-                      <AvatarImage src="/placeholder.svg?height=64&width=64" />
-                      <AvatarFallback className="bg-[#A63D00] text-white">RP</AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1">
-                      <div className="flex justify-between items-start mb-2">
-                        <div>
-                          <h3 className="text-xl font-semibold font-extrabold border-b-4 border-black">Rachel Park</h3>
-                          <p className="text-gray-600">Senior Data Scientist at Meta</p>
-                        </div>
-                        <div className="flex items-center space-x-1">
-                          <Star className="h-4 w-4 text-yellow-400 fill-current" />
-                          <span className="font-medium">4.7</span>
-                          <span className="text-gray-600">(89 reviews)</span>
-                        </div>
-                      </div>
-                      <div className="flex flex-wrap gap-2 mb-3">
-                        <Badge className="border-2 border-black rounded-full px-3 py-1 font-bold uppercase bg-[#FF6B35] text-white mx-1 my-1">Python</Badge>
-                        <Badge className="border-2 border-black rounded-full px-3 py-1 font-bold uppercase bg-[#4ECDC4] text-white mx-1 my-1">Data Science</Badge>
-                        <Badge className="border-2 border-black rounded-full px-3 py-1 font-bold uppercase bg-[#8B3400] text-white mx-1 my-1">Statistics</Badge>
-                        <Badge className="border-2 border-black rounded-full px-3 py-1 font-bold uppercase bg-[#4ECDC4] text-white mx-1 my-1">R</Badge>
-                      </div>
-                      <p className="text-gray-600 mb-4">
-                        Experienced data scientist with 8+ years in the field. Specializes in predictive modeling,
-                        statistical analysis, and helping students transition into data science careers.
-                      </p>
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-6 text-sm text-gray-600">
-                          <div className="flex items-center space-x-1">
-                            <Users className="h-4 w-4" />
-                            <span>73 students mentored</span>
-                          </div>
-                          <div className="flex items-center space-x-1">
-                            <MapPin className="h-4 w-4" />
-                            <span>San Francisco, CA</span>
-                          </div>
-                          <div className="flex items-center space-x-1">
-                            <Clock className="h-4 w-4" />
-                            <span>Available weekends</span>
-                          </div>
-                        </div>
-                        <div className="flex space-x-2">
-                          <Button variant="outline" className="border-2 border-black text-black bg-transparent">
-                            View Profile
-                          </Button>
-                          <Button className="border-2 border-black rounded-md font-bold bg-[#A63D00] text-white px-6 py-2 transition-transform duration-150 hover:scale-105 hover:shadow-[0_0_12px_2px_#FFB800]">Connect</Button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="border-4 border-black rounded-xl shadow-[4px_4px_0_0_#000] bg-[#FFF8E1] p-8 mb-14" style={{ backgroundColor: '#FFF8E1', border: '4px solid #000' }} onMouseEnter={() => setHoveredCard(1)} onMouseLeave={() => setHoveredCard(null)}>
-                <CardContent className="p-6">
-                  <div className="flex items-start space-x-4">
-                    <Avatar className="h-16 w-16 border-4 border-black">
-                      <AvatarImage src="/placeholder.svg?height=64&width=64" />
-                      <AvatarFallback className="bg-[#A63D00] text-white">DW</AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1">
-                      <div className="flex justify-between items-start mb-2">
-                        <div>
-                          <h3 className="text-xl font-semibold font-extrabold border-b-4 border-black">David Wilson</h3>
-                          <p className="text-gray-600">Mobile Development Lead at Spotify</p>
-                        </div>
-                        <div className="flex items-center space-x-1">
-                          <Star className="h-4 w-4 text-yellow-400 fill-current" />
-                          <span className="font-medium">4.8</span>
-                          <span className="text-gray-600">(142 reviews)</span>
-                        </div>
-                      </div>
-                      <div className="flex flex-wrap gap-2 mb-3">
-                        <Badge className="border-2 border-black rounded-full px-3 py-1 font-bold uppercase bg-[#FF6B35] text-white mx-1 my-1">React Native</Badge>
-                        <Badge className="border-2 border-black rounded-full px-3 py-1 font-bold uppercase bg-[#4ECDC4] text-white mx-1 my-1">Flutter</Badge>
-                        <Badge className="border-2 border-black rounded-full px-3 py-1 font-bold uppercase bg-[#4ECDC4] text-white mx-1 my-1">iOS</Badge>
-                        <Badge className="border-2 border-black rounded-full px-3 py-1 font-bold uppercase bg-[#8B3400] text-white mx-1 my-1">Android</Badge>
-                      </div>
-                      <p className="text-gray-600 mb-4">
-                        Mobile development expert with focus on cross-platform solutions. Passionate about helping
-                        developers create beautiful, performant mobile applications.
-                      </p>
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-6 text-sm text-gray-600">
-                          <div className="flex items-center space-x-1">
-                            <Users className="h-4 w-4" />
-                            <span>98 students mentored</span>
-                          </div>
-                          <div className="flex items-center space-x-1">
-                            <MapPin className="h-4 w-4" />
-                            <span>New York, NY</span>
-                          </div>
-                          <div className="flex items-center space-x-1">
-                            <Clock className="h-4 w-4" />
-                            <span>Available evenings</span>
-                          </div>
-                        </div>
-                        <div className="flex space-x-2">
-                          <Button variant="outline" className="border-2 border-black text-black bg-transparent">
-                            View Profile
-                          </Button>
-                          <Button className="border-2 border-black rounded-md font-bold bg-[#A63D00] text-white px-6 py-2 transition-transform duration-150 hover:scale-105 hover:shadow-[0_0_12px_2px_#FFB800]">Connect</Button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="border-4 border-black rounded-xl shadow-[4px_4px_0_0_#000] bg-[#FFF8E1] p-8 mb-14" style={{ backgroundColor: '#FFF8E1', border: '4px solid #000' }} onMouseEnter={() => setHoveredCard(2)} onMouseLeave={() => setHoveredCard(null)}>
-                <CardContent className="p-6">
-                  <div className="flex items-start space-x-4">
-                    <Avatar className="h-16 w-16 border-4 border-black">
-                      <AvatarImage src="/placeholder.svg?height=64&width=64" />
-                      <AvatarFallback className="bg-[#A63D00] text-white">LT</AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1">
-                      <div className="flex justify-between items-start mb-2">
-                        <div>
-                          <h3 className="text-xl font-semibold font-extrabold border-b-4 border-black">Lisa Thompson</h3>
-                          <p className="text-gray-600">DevOps Engineer at Amazon</p>
-                        </div>
-                        <div className="flex items-center space-x-1">
-                          <Star className="h-4 w-4 text-yellow-400 fill-current" />
-                          <span className="font-medium">4.9</span>
-                          <span className="text-gray-600">(76 reviews)</span>
-                        </div>
-                      </div>
-                      <div className="flex flex-wrap gap-2 mb-3">
-                        <Badge className="border-2 border-black rounded-full px-3 py-1 font-bold uppercase bg-[#FF6B35] text-white mx-1 my-1">AWS</Badge>
-                        <Badge className="border-2 border-black rounded-full px-3 py-1 font-bold uppercase bg-[#4ECDC4] text-white mx-1 my-1">Docker</Badge>
-                        <Badge className="border-2 border-black rounded-full px-3 py-1 font-bold uppercase bg-[#8B3400] text-white mx-1 my-1">Kubernetes</Badge>
-                        <Badge className="border-2 border-black rounded-full px-3 py-1 font-bold uppercase bg-[#4ECDC4] text-white mx-1 my-1">CI/CD</Badge>
-                      </div>
-                      <p className="text-gray-600 mb-4">
-                        Cloud infrastructure and DevOps specialist. Helps students understand modern deployment practices
-                        and cloud architecture patterns.
-                      </p>
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-6 text-sm text-gray-600">
-                          <div className="flex items-center space-x-1">
-                            <Users className="h-4 w-4" />
-                            <span>54 students mentored</span>
-                          </div>
-                          <div className="flex items-center space-x-1">
-                            <MapPin className="h-4 w-4" />
-                            <span>Seattle, WA</span>
-                          </div>
-                          <div className="flex items-center space-x-1">
-                            <Clock className="h-4 w-4" />
-                            <span>Flexible schedule</span>
-                          </div>
-                        </div>
-                        <div className="flex space-x-2">
-                          <Button variant="outline" className="border-2 border-black text-black bg-transparent">
-                            View Profile
-                          </Button>
-                          <Button className="border-2 border-black rounded-md font-bold bg-[#A63D00] text-white px-6 py-2 transition-transform duration-150 hover:scale-105 hover:shadow-[0_0_12px_2px_#FFB800]">Connect</Button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-          
           {isLoading ? (
             <div className="flex justify-center items-center py-12">
               <Loader2 className="h-12 w-12 animate-spin text-[#A63D00]" />
@@ -538,30 +215,110 @@ export default function MentorsPage() {
               <p className="text-red-500">{error}</p>
             </div>
           ) : (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {mentors.map((mentor) => (
-                <Card key={mentor.id} className="border-[#A63D00]/20 hover:shadow-lg transition-shadow">
-                  <CardHeader className="text-center">
-                    <Avatar className="h-20 w-20 mx-auto mb-4 ring-4 ring-[#A63D00]/20">
-                      <AvatarImage src={mentor.image || "/placeholder.svg?height=80&width=80"} />
-                      <AvatarFallback className="bg-[#A63D00] text-white text-xl">
-                        {mentor.name?.charAt(0).toUpperCase() || "M"}
-                      </AvatarFallback>
-                    </Avatar>
-                    <CardTitle className="text-xl">{mentor.name || "Mentor"}</CardTitle>
-                    <CardDescription>{mentor.email}</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex space-x-2 mt-4">
-                       <Button className="flex-1 bg-[#A63D00] hover:bg-[#A63D00]/90">Connect</Button>
-                       <Button variant="outline" className="border-[#A63D00] text-[#A63D00] bg-transparent">
-                         <MessageSquare className="h-4 w-4" />
-                       </Button>
-                     </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+            <>
+              {/* Featured Mentors */}
+              <div className="mb-12">
+                <h2 className="text-2xl font-bold text-gray-900 mb-6">Featured Mentors</h2>
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {mentors.slice(0, 3).map((mentor, index) => (
+                    <Card
+                      key={mentor.id}
+                      className="border-4 border-black rounded-xl shadow-[4px_4px_0_0_#000] hover:shadow-lg transition-shadow p-8 mb-14 animate-float"
+                      style={{ backgroundColor: BRUTALIST_COLORS[index % BRUTALIST_COLORS.length], border: '4px solid #000' }}
+                    >
+                      <CardHeader className="text-center">
+                        <Avatar className="h-20 w-20 mx-auto mb-4 ring-4 ring-black">
+                          <AvatarImage src={mentor.image || `https://api.dicebear.com/8.x/pixel-art/svg?seed=${mentor.name}`} />
+                          <AvatarFallback className="bg-[#A63D00] text-white text-xl">
+                            {mentor.name?.charAt(0).toUpperCase() || "M"}
+                          </AvatarFallback>
+                        </Avatar>
+                        <CardTitle className="text-xl font-extrabold border-b-4 border-black">{mentor.name}</CardTitle>
+                        <CardDescription>{mentor.email}</CardDescription>
+                        <div className="flex items-center justify-center space-x-1 mt-2">
+                          <Star className="h-4 w-4 text-yellow-400 fill-current" />
+                          <span className="font-medium">4.9</span>
+                          <span className="text-gray-600">(127 reviews)</span>
+                        </div>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-4">
+                          <div className="flex flex-wrap gap-2">
+                            {(mentor.skills || []).map((skill) => (
+                              <Badge key={skill} className="border-2 border-black rounded-full px-3 py-1 font-bold uppercase bg-[#FF6B35] text-white mx-1 my-1">{skill}</Badge>
+                            ))}
+                          </div>
+                          <p className="text-sm text-gray-600">
+                            5+ years helping students master full-stack development and prepare for technical interviews.
+                          </p>
+                          <div className="flex items-center space-x-4 text-sm text-gray-600">
+                            <div className="flex items-center space-x-1">
+                              <Users className="h-4 w-4" />
+                              <span>89 students</span>
+                            </div>
+                            <div className="flex items-center space-x-1">
+                              <Award className="h-4 w-4" />
+                              <span>Top Mentor</span>
+                            </div>
+                          </div>
+                          <div className="flex space-x-2">
+                            <Button className="border-2 border-black rounded-md font-bold bg-[#A63D00] hover:bg-[#A63D00]/90 text-white px-6 py-2">Connect</Button>
+                            <Button variant="outline" className="border-2 border-black text-black bg-transparent px-6 py-2 mx-1">
+                              <MessageSquare className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+
+              {/* All Mentors */}
+              <div>
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-2xl font-bold text-gray-900">All Mentors</h2>
+                  <div className="flex space-x-2">
+                    <Button variant="outline" className="border-2 border-black text-black bg-transparent">
+                      Sort by Rating
+                    </Button>
+                    <Button variant="outline" className="border-2 border-black text-black bg-transparent">
+                      Sort by Experience
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {mentors.map((mentor) => (
+                    <Card key={mentor.id} className="border-[#A63D00]/20 hover:shadow-lg transition-shadow">
+                      <CardHeader className="text-center">
+                        <Avatar className="h-20 w-20 mx-auto mb-4 ring-4 ring-[#A63D00]/20">
+                          <AvatarImage src={mentor.image || `https://api.dicebear.com/8.x/pixel-art/svg?seed=${mentor.name}`} />
+                          <AvatarFallback className="bg-[#A63D00] text-white text-xl">
+                            {mentor.name?.charAt(0).toUpperCase() || "M"}
+                          </AvatarFallback>
+                        </Avatar>
+                        <CardTitle className="text-xl">{mentor.name || "Mentor"}</CardTitle>
+                        <CardDescription>{mentor.email}</CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="flex flex-wrap gap-2 mb-3">
+                          {(mentor.skills || []).map((skill) => (
+                            <Badge key={skill} className="border-2 border-black rounded-full px-3 py-1 font-bold uppercase bg-[#FF6B35] text-white mx-1 my-1">{skill}</Badge>
+                          ))}
+                        </div>
+                        <div className="flex space-x-2 mt-4">
+                          <Button className="flex-1 bg-[#A63D00] hover:bg-[#A63D00]/90">Connect</Button>
+                          <Button variant="outline" className="border-[#A63D00] text-[#A63D00] bg-transparent">
+                            <MessageSquare className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            </>
           )}
         </div>
       </PageTransition>

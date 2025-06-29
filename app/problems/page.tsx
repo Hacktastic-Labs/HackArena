@@ -305,6 +305,7 @@ export default function ProblemsPage() {
     </button>
   ) : (
     <button
+      onClick={() => router.push(`/problems/${problem.id}`)}
       className="bg-[#FDFCF8] text-black font-bold rounded-md px-6 py-2 border-2 border-black transition-transform duration-150 hover:scale-105 hover:shadow-[2px_2px_0_0_#000]"
     >
       Find Mentor

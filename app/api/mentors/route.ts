@@ -20,6 +20,7 @@ export async function GET(_request: NextRequest) {
         role: true,
         createdAt: true,
         updatedAt: true,
+        skills: true,
       },
     });
     console.log("Mentors found in database:", mentors);

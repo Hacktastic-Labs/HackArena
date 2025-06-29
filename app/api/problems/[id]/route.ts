@@ -7,9 +7,9 @@ const prisma = new PrismaClient();
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } }
 ) {
-  const id = params.id;
+  const id = context.params.id;
   try {
     const problem = await prisma.problem.findUnique({
       where: { id: id },
@@ -40,7 +40,7 @@ export async function GET(
 
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } }
 ) {
   const session = await auth.api.getSession({
     headers: await headers(),
@@ -50,9 +50,9 @@ export async function PATCH(
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
 
-  const problemId = params.id;
+  const problemId = context.params.id;
   const body = await req.json();
-  const { title, description, tags } = body;
+  const { title, description, tags, status } = body;
 
   try {
     const problem = await prisma.problem.findUnique({
@@ -63,21 +63,32 @@ export async function PATCH(
       return NextResponse.json({ error: "Problem not found" }, { status: 404 });
     }
 
-    if (problem.userId !== session.user.id) {
-      return NextResponse.json(
-        { error: "Only the author can edit the problem" },
-        { status: 403 }
-      );
-    }
+    let updatedProblem;
 
-    const updatedProblem = await prisma.problem.update({
-      where: { id: problemId },
-      data: {
-        title: title || problem.title,
-        description: description || problem.description,
-        tags: tags || problem.tags,
-      },
-    });
+    if (status) {
+      if (problem.mentorId !== session.user.id) {
+        return NextResponse.json({ error: "Only the assigned mentor can change the status" }, { status: 403 });
+      }
+      updatedProblem = await prisma.problem.update({
+        where: { id: problemId },
+        data: { status },
+      });
+    } else {
+      if (problem.userId !== session.user.id) {
+        return NextResponse.json(
+          { error: "Only the author can edit the problem" },
+          { status: 403 }
+        );
+      }
+      updatedProblem = await prisma.problem.update({
+        where: { id: problemId },
+        data: {
+          title: title || problem.title,
+          description: description || problem.description,
+          tags: tags || problem.tags,
+        },
+      });
+    }
 
     return NextResponse.json(updatedProblem);
   } catch (error) {
