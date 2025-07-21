@@ -304,13 +304,13 @@ export default function EventsPage({
               <div className="relative">
                 <Input
                   placeholder="Search events..."
-                  className="w-64 border-2 border-black rounded-lg shadow-[4px_4px_0_0_#000] focus:shadow-[6px_6px_0_0_#000] transition-shadow"
+                  className="w-64 border-2 border-black rounded-lg shadow-[4px_4px_0_0_#000] focus:shadow-[4px_4px_0_0_#000] focus:border-black hover:border-black transition-all"
                 />
                 <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
               </div>
               <Link href="/events/create" legacyBehavior>
                 <Button className="font-bold border-2 border-black rounded-lg bg-yellow-400 text-black shadow-[4px_4px_0_0_#000] hover:bg-yellow-500 hover:shadow-[6px_6px_0_0_#000] transition-all">
-                  <Plus className="mr-2" />
+                  <Plus className="mr-1" />
                   Create Event
                 </Button>
               </Link>
@@ -321,28 +321,28 @@ export default function EventsPage({
             <TabsList className="bg-transparent p-0 inline-flex gap-4 mb-4">
               <TabsTrigger
                 value="all-events"
-                className="bg-[#FFB74D] border-2 border-black rounded-lg shadow-[4px_4px_0_0_#000] px-6 py-2 text-black font-bold data-[state=active]:bg-black data-[state=active]:text-white transition-all"
+                className="bg-[#FFB74D] border-2 border-black rounded-lg shadow-[4px_4px_0_0_#000] px-6 py-2 text-black font-bold data-[state=active]:bg-black data-[state=active]:text-white data-[state=active]:shadow-[4px_4px_0_0_#FFB74D] transition-all"
               >
                 <BookOpen className="mr-2" />
                 All Events
               </TabsTrigger>
               <TabsTrigger
                 value="my-events"
-                className="bg-[#FFB74D] border-2 border-black rounded-lg shadow-[4px_4px_0_0_#000] px-6 py-2 text-black font-bold data-[state=active]:bg-black data-[state=active]:text-white transition-all"
+                className="bg-[#FFB74D] border-2 border-black rounded-lg shadow-[4px_4px_0_0_#000] px-6 py-2 text-black font-bold data-[state=active]:bg-black data-[state=active]:text-white data-[state=active]:shadow-[4px_4px_0_0_#FFB74D] transition-all"
               >
                 <Code className="mr-2" />
                 My Events
               </TabsTrigger>
               <TabsTrigger
                 value="hackathons"
-                className="bg-[#FFB74D] border-2 border-black rounded-lg shadow-[4px_4px_0_0_#000] px-6 py-2 text-black font-bold data-[state=active]:bg-black data-[state=active]:text-white transition-all"
+                className="bg-[#FFB74D] border-2 border-black rounded-lg shadow-[4px_4px_0_0_#000] px-6 py-2 text-black font-bold data-[state=active]:bg-black data-[state=active]:text-white data-[state=active]:shadow-[4px_4px_0_0_#FFB74D] transition-all"
               >
                 <Video className="mr-2" />
                 Hackathons
               </TabsTrigger>
               <TabsTrigger
                 value="workshops"
-                className="bg-[#FFB74D] border-2 border-black rounded-lg shadow-[4px_4px_0_0_#000] px-6 py-2 text-black font-bold data-[state=active]:bg-black data-[state=active]:text-white transition-all"
+                className="bg-[#FFB74D] border-2 border-black rounded-lg shadow-[4px_4px_0_0_#000] px-6 py-2 text-black font-bold data-[state=active]:bg-black data-[state=active]:text-white data-[state=active]:shadow-[4px_4px_0_0_#FFB74D] transition-all"
               >
                 <Users className="mr-2" />
                 Workshops

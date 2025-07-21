@@ -121,6 +121,10 @@
   }
 }
 
+html {
+  font-size: 90%;
+}
+
 /* Custom neo-brutalist button styles with bordered middle layer */
 .neo-brutalist-button {
   position: relative;
@@ -217,3 +221,5 @@ input:focus, textarea:focus, select:focus {
 .circle-shadow {
   box-shadow: 4px 0 10px 0 rgba(0,0,0,0.10);
 }
+
+/* Removed global scaling from html to fix layout issues */

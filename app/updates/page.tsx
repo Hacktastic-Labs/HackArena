@@ -203,14 +203,14 @@ export default function UpdatesPage() {
                       setIsRefreshing(false);
                     }
                   }}
-                  className="bg-[#FFB74D] border-2 border-[#A63D00] rounded-none shadow-[4px_4px_0px_#000] text-black hover:bg-[#A63D00] hover:text-white"
+                  className="bg-[#FFB74D] border-2 border-[#A63D00] rounded-lg shadow-[4px_4px_0px_#A63D00] text-black hover:bg-[#FAEBD7] hover:text-black transition-all duration-150"
                 >
                   {isRefreshing ? "Refreshing..." : "Refresh Tech News"}
                 </Button>
               )}
               <Button
                 variant="outline"
-                className="bg-[#FFB74D] border-2 border-[#A63D00] rounded-none shadow-[4px_4px_0px_#000] text-black hover:bg-[#A63D00] hover:text-white"
+                className="bg-[#FFB74D] border-2 border-[#A63D00] rounded-lg shadow-[4px_4px_0px_#A63D00] text-black hover:bg-[#FAEBD7] hover:text-black transition-all duration-150"
               >
                 Mark All Read
               </Button>
@@ -221,15 +221,17 @@ export default function UpdatesPage() {
             {announcements.map((a, i) => (
               <Card
                 key={a.id}
-                className={`${
-                  i % 2 === 0 ? "bg-[#FFF8E1]" : "bg-[#FFE8CC]"
-                } border-2 border-[#A63D00] rounded-none shadow-[4px_4px_0px_#000] cursor-pointer`}
+                className={`
+                  ${i % 2 === 0 ? "bg-[#FFF8E1]" : "bg-[#FFE8CC]"}
+                  border-2 border-[#A63D00] rounded-xl shadow-[4px_4px_0px_#A63D00] cursor-pointer transition-all duration-150
+                  hover:shadow-[8px_8px_0px_#A63D00] hover:-translate-y-1
+                `}
                 onClick={() => a.url && window.open(a.url, "_blank")}
               >
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <div>
-                      <CardTitle className="text-lg">{a.title}</CardTitle>
+                      <CardTitle className="text-lg font-bold text-gray-900">{a.title}</CardTitle>
                       {a.description && (
                         <CardDescription className="mt-2">
                           {a.url ? (

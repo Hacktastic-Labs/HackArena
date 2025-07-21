@@ -312,7 +312,7 @@ export default function HomePage() {
       <div className="w-full overflow-hidden leading-none"></div>
 
       {/* CTA Section */}
-      <section className="relative py-12 px-4 sm:px-6 lg:px-8 bg-[#B34700]">
+      <section className="relative py-20 px-4 sm:px-6 lg:px-8 bg-[#B34700]">
         {/* Flat yellow strip at the top */}
         <div className="absolute left-0 top-0 w-full" style={{zIndex:2, height:'14px', background:'#FFB74D', pointerEvents:'none'}}></div>
         <div className="max-w-4xl mx-auto text-center relative z-10">
@@ -341,7 +341,7 @@ export default function HomePage() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12 px-4 sm:px-6 lg:px-8">
+      <footer className="bg-gray-900 text-white py-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-4 gap-8">
             <div>
