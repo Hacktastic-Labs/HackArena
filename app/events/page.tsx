@@ -308,7 +308,7 @@ export default function EventsPage({
                 />
                 <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
               </div>
-              <Link href="/events/create" legacyBehavior>
+              <Link href="/events/create">
                 <Button className="font-bold border-2 border-black rounded-lg bg-yellow-400 text-black shadow-[4px_4px_0_0_#000] hover:bg-yellow-500 hover:shadow-[6px_6px_0_0_#000] transition-all">
                   <Plus className="mr-1" />
                   Create Event
